@@ -1,0 +1,212 @@
+\chapter{Introduction à l'étude de la propagation des ondes de surface}
+
+L'équation que nous nous proposons d'étudier dans ce rapport, équation de Benjamin-Bona-Mahony (publiée pour la première fois dans \textit{Model Equation for long waves in nonlinear dispersive systems} \cite{BBM} en 1972), est une variante d'une équation publiée en 1895 par D. J. Korteweg et G. de Vries \cite{KdV}, l'équation de Korteweg de Vries (KdV) dont nous justifierons l'expression dans le chapitre suivant.
+Cette équation sert de modèle pour les ondes de surface non-linéaires en milieu dispersif, il s'agît d'une approximation des équations du mouvement, adaptée à ce cadre précis de propagation de vague.
+
+Nous allons ainsi faire une brève introduction aux ondes de surface ainsi qu'à leur propagation, afin de poser quelques bases nécessaires à la bonne compréhension du contexte physique du modèle.
+
+\section{Notions de base}
+
+
+Le point commun entre les tsunami, les vagues scélérates (vagues océaniques particulièrement hautes et "soudaines"), les sillages de Kelvin (onde définissant le "sillage" d'un bateau après son passage dans une eau calme), les ondes orographiques (formations nuageuses particulières), le mouvevement du café dans une tasse lorsqu'on marche (ballotement) ou plus généralement les vagues en milieu ouvert, est qu'il s'agît d'ondes de gravité. 
+
+% \begin{figure}[H]
+%   \centering
+%   \begin{minipage}{0.43\textwidth}
+%     \centering
+%     \includegraphics[width=\linewidth]{Image/Wave_cloud.jpg}
+%     \caption{Onde orographique au dessus de l'île Amsterdam (Océan Indien). \textit{Crédits photo : Nasa}}
+%   \end{minipage}
+%   \hfill % Espace horizontal entre les images
+%   \begin{minipage}{0.48\textwidth}
+%     \centering
+%     \includegraphics[width=\linewidth]{Image/sillage02.png}
+%     \caption{Sillage de Kelvin derrière un canard}
+%   \end{minipage}
+% \end{figure}
+
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{Image/Wave_cloud.jpg}
+    \caption{Onde orographique au dessus de l'île Amsterdam (Océan Indien). \textit{Crédits photo : NASA}}
+    \label{fig:sub1}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{Image/sillage02.png}
+    \caption{Sillage de Kelvin derrière un canard}
+    \label{fig:sub2}
+  \end{subfigure}
+  \caption{Exemples d'ondes de gravité}
+  \label{fig:global}
+\end{figure}
+
+L'équation KdV répond initialement au besoin de comprendre et modéliser certaines de ces ondes de gravité.
+
+Certaines de ces ondes, comme les vagues scélérates ou certaines vagues dans un canal, sont des solutions particulières de l'équation KdV. Dans le cas des vagues (certaines) dans un canal par exemple, nous appelons aussi ces solutions particulières des solitons. Ces sont des ondes solitaires qui ont la particularité de se propager sans déformer le milieu non-linéaire et dispersif qu'elles parcourent (et même de reprendre leur forme initiale après une interaction avec un autre soliton).
+
+Le modèle que nous étudions sert à l'étude de la propagation de ces ondes de gravité, de faible amplitude face à leur longueur d'onde, respectant certaines propriétés (non-linéarité et dispersion, que nous définirons plus tard).
+Le développement du modèle KdV est le fruit du travail de plusieurs mathématiciens et physiciens, étalé sur une cinquantaine d'années au $\text{XIX}^e$ siècle.
+Le point de départ du développement de cette théorie remonte à 1834, lorsque John Scott Russel, ingénieur naval et mathématicien britanique, supervisant un chantier sur un canal assista à l'arrêt brusque d'un bateau tiré par des chevaux, créant ainsi une vague. Il suit pendant plusieurs kilomètres cette vague remontant le courant et ne semblant pas faiblir. Le témoingnage de John Scott Russel est accompagné d'un rapport sur les vagues dans les eaux de faible de profondeur (où il y donne notamment une expression empirique de la vitesse de ce type de vague, dépendant de son amplitude). Des observations complémentaires sont faites dans les années qui suivent. En 1871 et 1872, Joseph Boussinesq établi l'équation qui régit la propagation des vagues en eau peu profonde \cite{Boussinesq}. Bien qu'en 1877 Boussinesq établi l'équation dont il est question ici dans \textit{Essai sur la théorie des eaux courantes} \cite{Boussinesq2} et fournit une démonstration de la stabilité du soliton, c'est en 1895 que les mathématiciens néerlandais D. J. Korteweg et G. de Vries approfondissent l'étude de ce modèle et explicitent en particulier le soliton \cite{KdV}.
+
+% Ce rapport étant rédigé par deux étudiants en mathématiques appliquées et destiné à un public de mathématiciens, il convient d’introduire et de préciser certains termes techniques liés à la physique des ondes qui seront utilisés tout au long du texte. Dans ce chapitre, nous nous intéressons à l’interprétation physique de l’équation BBM. Cette équation, qui permet de modéliser la propagation d’ondes de gravité de faible amplitude sur de longues distances, nécessite une bonne compréhension des phénomènes qu’elle décrit. Nous commencerons donc par présenter les concepts fondamentaux de la physique des ondes, avant d’examiner l’interprétation physique de l’équation BBM et les phénomènes associés.
+
+
+% On propose ici une introduction à la propagation d'ondes de surface, sujet central pour comprendre l'équation BBM.
+
+Nous allons ainsi définir le premier terme essentiel du modèle de vague que nous étudions, celui d'onde de gravité.
+
+\begin{definition}[Onde de gravité]
+\begin{definitionbox}
+    On définit comme onde de gravité toute perturbation de l'interface entre deux milieux (souvent l'eau et l'air) qui se propage sous l'effet stabilisateur de la gravité, laquelle tend à restaurer l'équilibre.
+\end{definitionbox}
+\end{definition}
+
+En principe, un fluide soumis à un champ de pesanteur est soumis à son poids et est ainsi attiré vers le bas. Son poids est compensé par la poussée d'Archimède, qui, en théorie devrait parfaitement compenser la gravité en l'absence d'autre mouvement. Lorsqu'on considère des fluides dits verticalement stratifiés (c'est à dire dont la densité varie en fonction de la profondeur, en raison de la décroissance du champ de pesanteur avec l'altitude), une quantité de fluide qui serait déplacée vers le bas se retrouverait dans une zone à plus forte densité. La poussée d'archimède fera donc remonter cette quantité et ainsi, en lui imprimant une certaine vitesse, lui fera dépasser son point d'équilibre, laissant la gravité effectuer l'action inverse.
+Nous venons de décrire un mouvement d'oscillation (comparable à une masse fixée à un ressort) dû à la gravité dans un fluide.
+
+En océanographie, ce type de mouvement (houle) est souvent lié au vent, qui active le processus que nous avons précédemment décrit. Le vent crée des différences de hauteur sur l'eau, qui se propagent dans la direction du vent (en négligeant d'autres effets tels que la force de Coriolis). L'eau au sommet de la vague ayant une énergie potentielle de pesanteur plus élevée que celle dans le creux, la gravité tend à ramener cette dernière dans une position d'équilibre sur un point médiant. De cette manière la vague se propage. 
+
+\vspace{1em}
+Dans la suite, nous supposerons que le fluide est incompressible, homogène et parfait (absence de viscosité). 
+% On etends par là que la densité du fluide est constante et que les forces de frottement sont négligeables.
+
+
+\section{Le vocabulaire des ondes}
+
+Pour décrire mathématiquement la propagation d'une perturbation à la surface d'un fluide, il est nécessaire de traduire des phénomènes physiques observés en variables quantifiables. Cette modélisation repose sur des concepts fondamentaux qui permettent de caractériser la structure dynamique des ondes.
+
+L'étude des ondes de surface s'appuie sur la notion d'onde harmonique simple qui sert de brique élémentaire pour construire des perturbations complexes. Une telle onde est définie par son amplitude $\alpha$, représentant le déplacement vertical maximal de la surface par rapport au repos.
+
+Sa périodicité se manifeste à deux echelles distinctes :
+
+\begin{itemize}
+    \item La périodicité spatiale $\lambda$ correspond à la distance entre deux crêtes successives \item La périodicité temporelle $T$ représente le temps nécessaire pour qu'un point fixe du milieu oscille durant un cycle complet. 
+\end{itemize}
+
+Avec ces paramètres géométriques de base, on peut définir la structure fine de l'onde :
+
+\begin{itemize}
+    \item Le nombre d'onde $k = \frac{2\pi}{\lambda}$ mesure la densité de répétition de l'onde dans l'espace
+    \item La fréquence angulaire $\omega = \frac{2\pi}{T}$ qui quantifie la rapidité des oscillations temporelles. 
+\end{itemize}
+
+La relation mathématique qui relie ces deux grandeurs $\omega$ et $k$ est appelée la relation de dispersion $\omega = W(k)$. Elle dicte comment les différentes composantes d'un paquet d'onde se propagent les unes par rapport aux autres. Dans un milieu non dispersif, toutes les composantes voyagent exactement à la même vitesse. La forme globale de l'onde est donc parfaitement conservée au cours du temps. En revanche, dans un milieun dispersif comme celui que nous etudions, la vitesse dépend de la longueur d'onde. Les differentes composantes d'une vague se séparent progressivement, provoquant un étalement et une déformation du paquet d'ondes initial.
+
+De la relation de dispersion découlent deux vitesses essentielles pour comprendre le transport de l'information et de l'énergie :
+
+\begin{itemize}
+    \item La vitesse de phase $c$. Elle décrit la vitesse avec laquelle une crête ou un creux se déplace dans le domaine. Elle est définie par la relation :
+    \[ c(k) = \frac{\omega}{k}\]
+    \item La vitesse de groupe $c_g$. Elle représente la vitesse à laquelle se déplace l'enveloppe globale du paquet d'ondes et dicte donc la vitesse à laquelle l'énergie est transportée dans le système. Elle se calcule par la dérivée de la fréquence par rapport au nombre d'onde :
+    \[ c_g(k) = \frac{d\omega}{dk}\]
+\end{itemize}
+
+
+% \begin{figure}[htbp]
+%     \centering
+%     % Remplace "mon_image.png" par le nom de ton fichier.
+%     % Tu peux ajuster la largeur (ici 80% de la largeur de la ligne de texte).
+%     \includegraphics[width=0.8\textwidth]{Image/Figure_1.png}
+    
+%     \caption{Point de vue de la vague}
+%     \label{fig:im1}
+% \end{figure}
+
+
+
+% \begin{figure}[htbp]
+%     \centering
+%     % Remplace "mon_image.png" par le nom de ton fichier.
+%     % Tu peux ajuster la largeur (ici 80% de la largeur de la ligne de texte).
+%     \includegraphics[width=0.8\textwidth]{Image/Figure_2.png}
+    
+%     \caption{Point de vue de l'observateur}
+%     \label{fig:im2}
+% \end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{Image/Figure_1.png}
+    \caption{Point de vue de la vague}
+    \label{fig:sub1}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{Image/Figure_2.png}
+    \caption{Point de vue de l'observateur}
+    \label{fig:sub2}
+  \end{subfigure}
+  \caption{}
+  \label{fig:global}
+\end{figure}
+
+
+\section{Différents modèles de vagues}
+
+Puisqu'il est ici question de modéliser des vagues dans des conditions particulières, nous allons brièvement évoquer les différents modèles existant ainsi que leur domaines de validités et leurs limites, afin de mieux nous situer dans le contexte physique de l'équation BBM.
+
+\vspace{1em}
+
+Les modèles de vagues reposent généralement sur des approximations des équations de Navier-Stokes qui décrivent l'écoulement de fluides visqueux ou des équations d'Euler pour des fluides incompressibles parfaits. 
+
+Les équations de Navier-Stokes pour un écoulement de fluide newtonien incompressible (où $\textbf{u}$ est le champ de vitesse du fluide) s'écrivent de la manière suivante :
+$$\rho \Big(\partial_t \textbf{u} + (\textbf{u}\cdot\nabla)\textbf{u} \Big) = \mu \Delta \textbf{u} + \textbf{f} - \nabla p $$
+Et pour les équations d'Euler, pour un fluide  newtonien parfait incompressible :
+$$\partial_t(\rho \textbf{u}) + \nabla \cdot ( \rho \textbf{u}\otimes\textbf{u}) = \rho\textbf{g} - \nabla p$$
+
+Ces deux équations constituent les briques élémentaires de la mécanique des fluides, décrivant de manière exacte les écoulements de fluides, mais nous ne sommes en mesure de les résoudre analytiquement que dans de très rares cas (ici en considérant des écoulements incompressibles, mais cela est d'autant plus vrai pour des écoulements compressibles). Dans les deux équations présentées on remarque la présence d'un terme non-linéaire, pour Navier-Stokes le terme source $\textbf{f}$ peut être compliqué en fonction de la situation modélisée (action du vent, marée, séisme...) en plus du terme d'ordre 2 dont le coefficient de viscosité dynamique $\mu$ n'est pas forcément constant. Même en supposant la densité du fluide constante, nous ne disposons pas, à ce jour, de solution générale pour ces équations. Pire encore, la démonstration de l'existence d'une solution régulière à l'équation de Navier-Stokes fait partie de la liste des problèmes du millénaire dressée par l'institut Clay, dont la démonstration serait récompensée d'un million de dollars.
+
+D'un point de vue numérique, même si les équations d'Euler et Naviers-Stokes permettent une description exacte, elles n'en restent pas moins coûteuses à implémenter numériquement. L'une des manières de contourner cette difficulté est de se placer dans certains régimes d'approximations propres aux situations considérées. Cela mène à l'élaboration des modèles associés aux différents types d'écoulements et de vagues, qui se basent sur les équations d'Euler et Navier-Stokes mais offrent l'avantage d'être plus simples à manipuler et permettent de calculer des solutions analytiques dans certains cas tout en décrivant le fluide dans un certain ordre d'approximation. 
+
+\vspace{1em}
+
+Une manière de classifier les vagues périodiques se fait par le biais des grandeurs suivantes :
+\begin{itemize}
+    \item La profondeur de l'eau $h$
+    \item La hauteur de crête à creux $H$ ou l'amplitude $a$ \big(qui correspond à $\frac{H}{2}$\big)
+    \item La longueur d'onde $\lambda$ ou le nombre d'onde $k = \frac{2\pi}{\lambda}$
+\end{itemize}
+
+\vspace{1em}
+
+A partir de ces informations physiques, nous pouvons introduire des nouvelles grandeurs sans dimension :
+\begin{itemize}
+    \item La cambrure $\frac{H}{\lambda}$
+    \item La profondeur relative $\frac{h}{\lambda}$
+\end{itemize}
+\vspace{1em}
+
+Ces grandeurs servent à classer les vagues de façon simpliste, dans une seule dimension d'espace, sans prendre en compte les irrégularités et en considérant le fond du cours d'eau plat (profondeur constante). Nous parlerons d'eau peu profonde lorsque la profondeur $h$ est petite devant la longueur d'onde $\lambda$, et de faible amplitude lorsque l'amplitude $a$ est petite devant la longueur d'onde $\lambda$ et inversement.
+
+Plusieurs modèles existent suivant ces différents paramètres, parmi ces modèles citons :
+
+\begin{itemize}
+    \item Les \textbf{équations de Boussinesq} sont un modèle dérivant des équations d'Euler et décrivant les vagues de faible amplitude en faible profondeur dans un milieu dispersif 
+    \item Les \textbf{équations de Barré de Saint-Venant} décrivent des vagues en milieu non dispersif dans des conditions similaires aux équations de Boussinesq où l'équilibre hydrostatique peut être établi (la gravité compense l'action des forces de pression).
+    \item Les \textbf{approximations de Stokes} se basent sur des développements limités des différentes grandeurs suivant la cambrure $\frac{H}{\lambda}$ et fournissent un modèle pour les vagues dans différents milieux. Par exemple, au premier ordre, le modèle est adapté aux vagues de petite amplitude en grand profondeur, on parle de modèle linéaire.
+\end{itemize}
+
+\vspace{1em}
+
+Parmi tous ces modèles, les équations de KdV et BBM se rapprochent du modèle d'équation de Boussinesq dans le sens où ces équations modélisent des vagues de faible amplitude en faible profondeur. L'intérêt des modèles KdV et BBM sont leurs effets de dispersion et non-linéarité qui se compensent, là où la non-linéarité domine sur les effets de dispersion dans les équations de Boussinesq.
+
+Par cette compensation entre non-linéarité et dispersion, KdV et BBM permettent de modéliser des ondes solitaires, se propageant tout en conservant le même profil et sans déformer le milieu qu'elles parcourent. 
+Pour donner un exemple de milieu dispersif dans lequel ces modèles entrent en validité, nous pouvons citer un canal (comme l'observation initiale d'un soliton par John Scott Russell) de faible profondeur 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Image/water.png}
+    
+    \caption{Différents modèles et leur validité \cite{water_waves} suivant le rapport hauteur/période$^2$ en fonction du rapport (profondeur relative)/période$^2$. On remarque une limite "\textit{breaking criterion}", qui correspond au critère à partir duquel la vague devient déferlante et qui constitue une limite à ces modèles de vagues.}
+    \label{water}
+\end{figure}
+
+Dans le schéma \ref{water} le modèle KdV (et BBM, puisque conçu originellement pour modéliser les mêmes phénomènes tout en garantissant une meilleure stabilité) se situe dans la zone \textit{shallow water theory} de \textit{cnoidal wave theory}, les ondes cnoïdales (que nous évoquerons brièvement plus loin) étant solutions exactes de l'équation KdV et également BBM.

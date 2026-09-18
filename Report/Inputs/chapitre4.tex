@@ -1,0 +1,688 @@
+\chapter{Analyse numérique de l'équation}
+\section{Solution par schéma hybride DF-VF}
+
+Soit $T > 0$ un temps arbitraire et $m \in \N$. Nous introduisons la discretisation de l'intervalle de temps $[0,T]$ définie par $\{0=t_0, t_1, \cdots, t_{m}, t_{m+1}=T \}$ avec pour pas de temps
+$\Delta t = \frac{T}{m+1}$
+
+On considère un domaine $I = ]a,b[$ subdivisé en $N$ cellules $\mathcal{C}_i = ]x_{i-\frac{1}{2}},x_{i+\frac{1}{2}}[$, de sorte que $x_0 = a$ et $x_{N+1} = b$, et de pas d'espace $\Delta x = \frac{b -a}{N+1}$.
+
+\vspace{1em}
+
+Nous allons construire une solution numérique avec un schéma hybride différences finies/volumes finis (DF/VF).
+
+Puisque l'équation s'écrit :
+$$\partial_tu + \partial_xu + u\partial_xu - \partial_{txx}u = 0$$
+Nous pouvons traiter la partie hyperbolique en introduisant le flux $f(u) = u + \frac{u^2}{2}$.
+
+Pour une loi de conservation scalaire de la forme $\partial_t u + \partial_x f(u) = 0$ nous utilisons le schéma volumes finis semi discret d'ordre 1 en espace:
+$$ \frac{d }{dt} u_i + \frac{1}{\Delta x} \bigl( \mathcal{F}_{i+\frac{1}{2}} - \mathcal{F}_{i - \frac{1}{2}} \bigr) = 0$$
+
+Avec les flux numériques $\mathcal{F}_{i+\frac{1}{2}} = \frac{1}{2}(f(u_{i+1}^n) + f(u_i^n)) - \gamma_{i+\frac{1}{2}}(u_{i+1}^n - u_{i}^n)$.
+
+
+Nous utilisons le flux de Lax-Friedrichs local (LF local ou Rusanov) $\gamma(u,v) = \max(|f'(u)|,|f'(v)|)$.
+
+\vspace{1em}
+
+Pour traiter la partie dispersive, nous utilisons un schéma différences finies de la forme :
+
+$$\mathcal{D}_i^{n,n+1} = \frac{1}{\Delta t} \Biggl( \frac{u_{i+1}^{n+1} - 2u_i^{n+1} + u_{i-1}^{n+1}}{\Delta x^2} - \frac{u_{i+1}^{n} - 2u_i^{n} + u_{i-1}^n}{\Delta x^2}\Biggr) $$
+
+La partie différences finies faisant intervenir plusieurs valeurs à l'instant $t^{n+1}$, nous faisons le choix d'une approximation d'ordre 1 en temps explicite (Euler explicite) pour le terme en volumes finis, afin d'obtenir au final un schéma implicite.
+
+En combinant ces différents termes nous obtenons notre premier schéma numérique hybride DF/VF :
+
+$$ \frac{u_i^{n+1} - u_i^n}{\Delta t} + \frac{\mathcal{F}_{i+\frac{1}{2}} - \mathcal{F}_{i - \frac{1}{2}}}{\Delta x} - \mathcal{D}_i^{n,n+1} = 0 $$
+
+$$\Leftrightarrow \frac{u_i^{n+1} - u_i^n}{\Delta t} + \frac{\mathcal{F}_{i+\frac{1}{2}} - \mathcal{F}_{i - \frac{1}{2}}}{\Delta x} - \frac{1}{\Delta t} \Biggl( \frac{u_{i+1}^{n+1} - 2u_i^{n+1} + u_{i-1}^{n+1}}{\Delta x^2} - \frac{u_{i+1}^{n} - 2u_i^{n} + u_{i-1}^n}{\Delta x^2}\Biggr) = 0$$
+
+$$\Leftrightarrow \bigl( 1 + \frac{2}{\Delta x^2}\bigr)u_i^{n+1} - \frac{1}{\Delta x^2}u_{i+1}^{n+1} - \frac{1}{\Delta x^2}u_{i - 1}^{n+1} = \bigl( 1 + \frac{2}{\Delta x^2}\bigr)u_i^n - \frac{1}{\Delta x^2}u_{i+1}^n - \frac{1}{\Delta x^2}u_{i-1}^n - \frac{\Delta t}{\Delta x} \bigl(\mathcal{F}_{i+\frac{1}{2}} - \mathcal{F}_{i - \frac{1}{2}} \bigr)$$
+
+Nous écrivons ce schéma sous la forme d'un système d'équations algébriques : 
+
+$$(I + \Delta_x)U^{n+1} = (I + \Delta_x)U^{n} - \Delta t \text{ Flux}(U^n) $$
+
+
+Où $\Delta_x$ est une matrice tridiagonale de taille $(N+1)\times(N+1)$
+
+$$
+\Delta_x = \frac{1}{\Delta x^2}
+\begin{pmatrix}
+    2 & -1 & 0   & \cdots & \cdots & 0 \\
+   -1 & 2  & -1  & \quad & \quad & \vdots \\
+    0 & -1 & 2   & -1 & \quad &\vdots \\
+    \vdots & \quad & \ddots & \ddots & \ddots & 0 \\
+    \vdots & \quad & \quad & \ddots & \ddots & -1 \\
+    0 & \cdots & \cdots & 0 & -1 & 2
+\end{pmatrix}
+, \quad \text{Flux}(U^n) = \frac{1}{\Delta x}
+\begin{pmatrix}
+    \mathcal{F}_{\frac{1}{2}} - \mathcal{F}_{-\frac{1}{2}} \\
+    \vdots \\
+    \vdots \\
+    \vdots \\
+    \mathcal{F}_{N + \frac{3}{2}} - \mathcal{F}_{N + \frac{1}{2}}
+\end{pmatrix}
+$$
+
+Nous imposons des conditions periodiques au bord du domaine $I$, ainsi nous avons $\mathcal{F}_{-\frac{1}{2}} = \mathcal{F}_{N +\frac{1}{2}}$ et $\mathcal{F}_{N + \frac{3}{2}} = \mathcal{F}_{\frac{1}{2}}$
+
+\vspace{1em}
+Le schéma défini ci-dessus a bien un sens, nous pouvons montrer qu'il existe une unique solution au système d'équations algébriques explicité.
+
+En effet, la matrice $I + \Delta_x$ est à diagonale strictement dominante :
+
+$$|(I + \Delta_x)_{ii}| = 1 + \frac{2}{\Delta x^2} > 2 = \underset{i \neq j}{\sum_{1\leq j \leq N+1}} |(I + \Delta_x)_{ij}| \quad \forall i \in \{1,...,N+1\} \text{ et } h<1$$
+
+D'après le lemme de Hadamard sur les matrices à diagonale strictement dominante, $(I + \Delta_x)$ est inversible, il existe donc une unique solution $U^{n+1}$ au système.
+
+
+\subsection{Consistance et précision}
+
+Etudions la consistance du schéma hybride que nous avons introduit dans la partie précédente.
+
+Nous commençons par la partie dispersive obtenue via différences finies. Nous allons effectuer des développements limités afin de montrer que cette partie est en $\mathcal{O}(\Delta x^2 + \Delta t)$
+
+Introduisons l'opérateur $Lu = \partial_{txx}u$ et l'opérateur approché $L_hu$ dont l'expression est donnée par l'approximation numérique introduite plus haut, soit 
+
+\begin{align*}
+    L_hu(x,t) = \frac{1}{\Delta t} \Biggl( \frac{u(x+ \Delta x, t + \Delta t) - 2u(x,t + \Delta t) + u(x- \Delta x,t + \Delta t)}{\Delta x^2}\\ 
+    - \frac{u(x+\Delta x,t) - 2u(x,t) + u(x-\Delta x, t)}{\Delta x^2} \Biggr)
+\end{align*}
+
+Alors puisque :
+
+\begin{align*}
+    \frac{u(x+\Delta x,t) - 2u(x,t) + u(x-\Delta x,t)}{\Delta x^2} &= \partial_{xx}^2u(x,t) + \frac{\Delta x^2}{12}\partial_{xxxx}^4u(x,t) + \mathcal{O}(\Delta x^3) \\
+    &= \partial_{xx}^2u(x,t) + \mathcal{O}(\Delta x ^2) 
+\end{align*}
+
+Nous avons :
+
+\begin{equation*}
+\begin{split}
+    L_hu(x,t) &= \frac{1}{\Delta t}\Bigl( \partial_{xx}^2u(x,t+\Delta t) - \partial_{xx}^2u(x,t) + \mathcal{O}(\Delta x^2) \Bigr) \\
+    &= \frac{1}{\Delta t} \Bigl( \Delta t \partial_{xxt}^3 u(x,t) + \mathcal{O}(\Delta x^2) + \mathcal{O}(\Delta t^2) \Bigr)\\
+    &= \partial_{xxt}^3u(x,t) + \mathcal{O}(\Delta x^2 + \Delta t)
+\end{split}
+\end{equation*}
+
+Donc l'opérateur approché $L_hu$ est consistant d'ordre 2 en espace et 1 en temps. 
+
+\vspace{1em}
+La partie conservative de l'équation utilise un schéma volumes finis avec flux de Lax-Friedrichs local.
+On a :
+\begin{equation*}
+\begin{split}
+    \mathcal{F}(u,u) &= \frac{1}{2}(f(u)+f(u)) -\gamma(u,u)(u - u)\\
+    &=f(u)
+\end{split}
+\end{equation*}
+Le flux numérique est donc consistant. Puisque le schéma volumes finis est d'ordre 1, nous pouvons en conclure que l'erreur de troncature du schéma global est donc en $\mathcal{O}(\Delta x + \Delta t)$
+
+\subsection{Stabilité}
+
+Après avoir montré la consistance du schéma, nous nous intéressons à la stabilité de ce dernier. Nous allons dans un premier temps nous pencher sur la stabilité de la partie dispersive, en différences finies, puis nous nous intéresserons à la variation totale de la partie volume finis du schéma et nous montrerons que ce dernier est à variation totale décroissante.
+
+\vspace{1em}
+Pour la partie dispersive, nous prenons la définition de stabilité suivante :
+$$\exists C >0, \forall \Delta x > 0, ||(I + \Delta_x)^{-1}||< C$$
+Notons $A:= (I +\Delta_x)$ la matrice de discrétisation associée au schéma
+
+Etudions la stabilité en norme $L^2$ de $A^{-1}$ :
+
+\vspace{1em}
+
+On note $\rho(A) = \underset{\lambda \in Sp(A)}{\max}|\lambda|$ le rayon spectral de $A$. 
+La norme $L^2$ de la matrice $A$ est définie par $||A||_{2} = \sqrt{\rho(A^*A)} = \rho(A)$ (puisque $A$ est symétrique réelle, donc hermitienne).
+
+Nous avons $||A^{-1}|| = \rho(A^{-1}) = \frac{1}{\rho(A)}$
+
+
+\begin{theorembox}
+\begin{theorem}
+    \textbf{Gerschgorin (1931)}
+    
+    On définit le $i^e$ disque de Gerschgorin par  $ \displaystyle \mathcal{D}_i = \Big\{z \in \mathbb{C}, \ |A_{ii} - z| \leq \sum_{j \neq i} |A_{ij}| \Big\} $, alors :
+    $$ Sp(A) \subset \bigcup_{i=1}^{n} \mathcal{D}_i$$
+\end{theorem}
+\end{theorembox}
+
+\begin{proof}
+    Soit $X$ un vecteur propre de $A$ associé à la valeur propre $\lambda$. Pour $i \in \{1,...,n \}$ nous avons :
+    \begin{equation*}
+    \begin{split}
+        (AX)_i &= \sum_{j=1}^{n}A_{ij}X_j = A_{ii}X_i + \sum_{j \neq i} A_{ij}X_j = \lambda X_i
+    \end{split}
+    \end{equation*}
+$$\Leftrightarrow (\lambda - A_{ii})X_i = \sum_{j\neq i} A_{ij}X_j$$
+Soit $i_0$ tel que $|X_{i_0}| \geq |X_i|, \text{ } \forall i\in \{1,..,n \}$. (Puisque $X$ est un vecteur propre, $X$ est non nul et donc nécessairement $X_{i_0} \neq 0$)
+$$|\lambda - A_{i_0i_0}| = \Bigg| \sum_{j\neq i_0} A_{i_0j}\frac{X_j}{X_{i_0}} \Bigg| \leq \sum_{j\neq i_0} \Big| A_{i_0j}\frac{X_j}{X_{i_0}} \Big| \leq \sum_{j\neq i_0} |A_{i_0j}|$$
+
+Donc $\lambda \in \mathcal{D}_{i_0}$.
+En répétant ce procédé pour chaque $\lambda\in Sp(A)$ nous obtenons finalement :
+$$Sp(A) \subset \bigcup_{i=1}^{n} \mathcal{D}_i $$
+\end{proof}
+
+Pour la matrice $A$ il n'y a que deux disques de Gerschgorin :
+$$\mathcal{D}_1 = \bar{B}\Bigl(1 + \frac{2}{\Delta x ^2},\frac{1}{\Delta x^2}\Bigr), \quad \mathcal{D}_2 = \bar{B}\Bigl( 1 + \frac{2}{\Delta x^2}, \frac{2}{\Delta x^2} \Bigr)$$
+Et nous avons $\mathcal{D}_1 \subset \mathcal{D}_2$, donc :
+$$Sp(A) \subset \mathcal{D}_2$$
+$A$ étant symétrique réelle, $Sp(A) \subset \R$, donc $Sp(A) \subset \mathcal{D}_2 \cap \R = [ 1,1 + \frac{4}{\Delta x^2} ]$
+
+Nous obtenons ainsi :
+$$1 \leq \rho(A) \leq 1 + \frac{4}{\Delta x^2}$$
+Et finalement, 
+$$\|A^{-1}\|_{2} = \frac{1}{\rho(A)} \leq 1$$
+Nous venons donc de montrer la stabilité $L^2$ pour $(I + \Delta_x)^{-1}$.
+\begin{remarkbox}
+\begin{remark}
+    Pour des conditions périodiques, de nouveaux coefficients -1 apparaissent dans les coins gauche inférieur et droit supérieur. 
+    Cela ne change pas l'étude de stabilité $L^2$ sur la matrice $(I + \Delta_x)^{-1}$ puisque dans ce cas la matrice n'admet qu'un seul disque de Gerschgorin, $\mathcal{D}_2$.
+\end{remark}
+\end{remarkbox}
+\vspace{1em}
+
+En ce qui concerne la partie volumes finis du schéma, la "bonne" (ou du moins l'une des bonnes) notion de stabilité à considérer dans le cas non-linéaire est la TV-stabilité que nous allons définir. 
+
+Premièrement, nous appelons variation totale d'une fonction $u \in L^1(\R)$ la quantité 
+$$TV(u) = \underset{\epsilon \rightarrow 0}{\lim} \underset{\epsilon > 0}{\sup} \frac{1}{\epsilon} \int_{-\infty}^{+\infty} |u(x + \epsilon) - u(x)| dx$$
+
+Et cette quantité, dans le cas discret, peut s'écrire :
+
+$$TV(u) = \sum_{i \in \mathbb{Z}} |u_{i+1} - u_i| $$
+\begin{definitionbox}
+\begin{definition}
+    Pour un problème de Cauchy avec une condition initiale $u_0 \in \mathcal{C}^1$ à support compact et un schéma volumes finis dont le flux numérique est consistant et lipschitzien suivant ses deux variables, on dira que le schéma est TV-stable ssi :
+
+    \vspace{1em}
+
+    Il existe $\Delta t_0 > 0$ et $K > 0$ tels que
+    $$\forall \Delta t \leq \Delta t_0, \forall n \in \N, \text{ tel que } \text{ } n\Delta t \leq T, \quad TV(u_h(\cdot,n\Delta t)) \leq K$$
+\end{definition}
+\end{definitionbox}
+
+L'une des caractérisations de la TV-stabilité s'obtient par la variation totale décroissante, qui est plus simple à établir dans les faits.
+
+On dira que le schéma est TVD si $\forall n\in \N, \text{ } TV(u_h(\cdot,t^{n+1})) \leq TV(u_h(\cdot,t^n))$
+
+Etant donné que le flux numérique s'exprime sous forme visqueuse, nous allons nous appuyer sur la proposition suivante, qui nous donne directement une condition CFL.
+
+\begin{propositionbox}
+\begin{proposition}
+    Soit un schéma volumes finis avec un flux numérique de la forme $\mathcal{F}_{i+\frac{1}{2}} = \frac{1}{2}(f(u_{i+1}^n) + f(u_i^n)) - \gamma_{i+\frac{1}{2}}(u_{i+1}^n - u_i^n)$
+
+    \vspace{1em}
+    
+    Alors ce schéma est TVD si :
+    $$\Bigg| \frac{f(u_{i+1}^n) - f(u_i^n)}{u_{i+1}^n - u_i^n} \Bigg| \leq \gamma_{i+\frac{1}{2}} \leq \frac{\Delta x}{\Delta t}$$
+\end{proposition}
+\end{propositionbox}
+
+\begin{proof}
+    
+\end{proof}
+
+D'un côté nous pouvons imposer directement la condition CFL $\gamma_{i+\frac{1}{2}} \leq \frac{\Delta x}{\Delta t}$. Mais nous devons vérifier si la deuxième inégalité est vérifiée, et si oui, sous quelle(s) condition(s).
+
+\begin{equation*}
+\begin{split}
+    \Bigg| \frac{f(u_{i+1}^n) - f(u_i^n)}{u_{i+1}^n - u_i^n} \Bigg| &= \Bigg| \frac{u_{i+1}^n - u_i^n + \frac{1}{2}(u_{i+1}^n)^2 - \frac{1}{2}(u_i^n)^2}{u_{i+1}^n - u_i^n} \Bigg| \\
+    &= \Bigg| \frac{(u_{i+1}^n - u_i^n)( 1 + \frac{1}{2}u_{i+1}^n + \frac{1}{2}u_i^n)}{u_{i+1}^n - u_i^n} \Bigg| \\
+    &= \frac{1}{2} \big| 2 + u_{i+1}^n + u_i^n \big| \\
+    &\leq \frac{1}{2}\big| 1 + u_{i+1}^n \big| + \frac{1}{2}\big| 1 + u_{i}^n \big|\\
+    &\leq \max(\big| 1 + u_{i}^n \big|,\big| 1 + u_{i+1}^n \big|) = \gamma_{i+\frac{1}{2}}
+\end{split}
+\end{equation*}
+
+La seconde condition sur $\gamma_{i+\frac{1}{2}}$ est vérifiée sans restriction, il ne subsiste alors que la condition CFL issue de l'inégalité de droite.
+
+La terme volumes finis du schéma hybride est alors TVD et donc TV-stable sous la condition :
+$$\gamma_{i+\frac{1}{2}} \leq \frac{\Delta x}{\Delta t} \Leftrightarrow \Delta t \leq \frac{\Delta x}{\max\big(|f'(u_{i}^n)|,|f'(u_{i+1}^n)|\big)}$$
+
+\vspace{1em}
+
+Nous pouvons en conclure que, puisque le terme dispersif est inconditionnellement $L^2$-stable et que le terme non linéaire volumes finis est TV-stable sous la condition CFL $\Delta t \leq \frac{\Delta x}{\max\big(|f'(u_{i}^n)|,|f'(u_{i+1}^n|)\big)}$, alors sous cette même condition le schéma hybride est stable.
+
+\subsection{Convergence}
+
+
+En ce qui concerne la convergence de notre schéma hybride, la partie dispersive se traite de manière simple en invoquant le théorème de Lax :
+
+\begin{theorembox}
+\begin{theorem}
+    \textbf{Lax}
+
+    Pour un schéma différences finies consistant approchant un problème d'évolution linéaire avec condition initale, le schéma est convergent si et seulement s'il est stable.
+\end{theorem}
+\end{theorembox}
+
+Ayant déjà montré que le terme dispersif, en différences finies, est consistant et $L^2$-stable, on en déduit directement que ce dernier est convergent.
+
+
+Pour la partie non linéaire, traitée à l'aide d'un schéma volumes finis nous devons introduire quelques définitions en vue du théorème de convergence pour les schémas conservatifs.
+
+
+\vspace{1em}
+
+On considère l'ensemble 
+$$\mathcal{W} = \Bigl\{ u \in L^1\big(\R \times [0,T]\big) \big| \; \partial_t u + \partial_x f(u) =0, \; \text{en un sens faible} \Bigr\}$$
+Muni de la norme 
+$$\| u\|_{L^1} = \int_{0}^{T} \int_{-\infty}^{+\infty} |u(x,t)| \; dxdt $$
+Pour quantifier la convergence, nous allons utiliser l'erreur globale que nous définissons par 
+$$\text{dist}\big(u_h,\mathcal{W}\big) = \underset{v \in \mathcal{W}}{\inf} \| u_h - v \|_{L^1}$$
+Enfin, nous définissons la variation totale pour une fonction $u \in L^1\bigl( \R \times [0,T] \bigr)$ par 
+$$TV_T(u) = \underset{\epsilon \rightarrow 0}{\lim}\sup \frac{1}{\epsilon} \int_{0}^{T}\int_{-\infty}^{+\infty} |v(x+ \epsilon,t) - v(x,t)| + |v(x,t+\epsilon) - v(x,t)| \; dx dt $$
+
+Et nous introduisons les espaces
+$$BV(\R) = \Bigl\{ u \in L^1(\R) \; | \; \exists R > 0, \exists M >0, \; TV(u) \leq \ R \; \text{et} \; \text{Supp}(u) \subset [-M,M] \Bigr\}$$
+et
+$$BV\bigl(\R \times [0,T]\bigr) = \Bigl\{ u \in L^1\bigl(\R \times [0,T]\bigr) \; | \; TV_T(u) \leq \ R \; \text{et} \; \text{Supp}\bigl(u(\cdot,t)\bigr) \subset [-M,M], \forall t \in [0,T] \Bigr\}$$
+
+Comme vu précédemment, la notion de stabilité utilisée dans le cadre d'un schéma conservatif pour un problème non-linéaire est celle de la TV-stabilité. Ce choix de définition nous mène à considérer des schémas volumes finis qui produisent des suites d'approximations bornées et à support compact. Autrement dit, la condition de TV-stabilité impose que les fonctions approchées $u_h$ (définies comme constantes par morceaux sur chaque cellule) soient dans $BV(\R \times [0,T])$.
+
+L'une des propriétés intéressantes de l'espace $BV$, et qui nous servira plus tard dans notre théorème de convergence, est sa compacité dans $L^1$. 
+
+Plus précisément, nous utilisons le résultat suivant :
+
+% \begin{theorembox}
+% \begin{theorem}
+%     \textbf{Fréchet - Kolmogorov}
+
+%     Soit $\Omega \subset \mathbb{R}^d$ un ouvert et $B \subset L^p(\Omega)$, $p \in [0,+\infty[$.
+
+%     \vspace{1em}
+    
+%     Alors $B$ est une partie relativement compacte de $L^p(\Omega)$ (c'est à dire qu'il existe un comptact $K \subset L^p(\Omega)$ tel que $B \subset K$) si et seulement si $B$ vérifie les conditions suivantes : 
+
+%     \begin{enumerate}
+%         \item $B$ est une partie bornée de $L^p(\Omega)$
+%         \item $\underset{r \to +\infty}{\lim} \int_{\|x\|>r} |f|^p \ dx = 0$ uniformément pour $f \in B$
+%         \item $\underset{\epsilon \to 0}{\lim} \| \tau_{\epsilon} f - f \|_{L^p} = 0 $ uniformément pour $f \in B$
+%     \end{enumerate}
+
+%     Où $\tau_hf = f(\cdot + h)$
+    
+% \end{theorem}
+% \end{theorembox}
+
+% En prenant $B = BV(\mathbb{R}\times[0,T])$, $\Omega = \mathbb{R}\times [0,T]$ et $p = 1$, nous pouvons vérifier les hypothèses du théorème précédent et montrer que $BV(\Omega)$ est relativement compact dans $L^p(\Omega)$.
+
+
+\begin{theorembox}
+\begin{theorem}
+    \textbf{Rellich - Kondrachov} \cite{Evans}
+
+    Si $\Omega$ est un ouvert borné régulier de $\R^n$, alors l'injection $BV(\Omega) \hookrightarrow L^1(\Omega)$ est compacte.
+\end{theorem}
+\end{theorembox}
+
+Nous renvoyons le lecteur en annexe pour une démonstration de ce résultat (basée sur un théorème d'injection de Sobolev).
+
+On remarque que le théorème impose que $\Omega$ soit borné, ce qui n'est pas le cas dans notre définition de $BV$, pour laquelle nous utilisons $\R$. L'hypothèse clé réside dans le fait que l'on impose que les fonctions de $BV$ soit à support compact, ce qui revient à travailler sur un intervalle borné au final.
+
+De toutes suites d'approximation dans $BV(\R)$ et $BV(\R \times [0,T])$ nous pouvons extraire une sous-suite convergente dans $L^1(\R)$ et $L^1\big( \R \times [0,T]\big)$.
+
+\vspace{1em}
+
+Avant d'introduire le théorème garantissant la convergence sous certaines hypothèses, nous rappelons le théorème de Lax-Wendroff qui servira d'argument dans la  suite :
+
+\begin{theorembox}
+\begin{theorem}
+    \textbf{Lax - Wendroff (1960)}
+
+    Soit $(\Delta x_m)_m$ et $(\Delta t_m)_m$ une suite de maillages uniformes de $\mathbb{R}\times \mathbb{R}_+$ telle que $\Delta x_m, \Delta t_m \underset{m \to +\infty}{\longrightarrow} 0$.
+    
+    Sur ce maillage on utilise un schéma conservatif et consistant approchant les solutions du problème de Cauchy $\partial_t u + \partial_xf(u) = 0$ dont la fonction flux numérique est notée $\mathcal{F}$. 
+    On note $(u_m)_{m \in \mathbb{Z}}$ la suite de fonctions constantes par morceaux produites par le schéma.
+
+    On suppose que 
+    \begin{enumerate}
+        \item Il existe une constante $K >0$ telle que $\|u_m\|_{L^\infty} \leq K, \ \forall m \in \mathbb{Z}$
+        \item Une fonction $u \in L^\infty(\mathbb{R}\times\mathbb{R_+})$ telle que $\underset{m \to +\infty}{\lim}u_m(x,t) = u(x,t)$ presque partout dans $\mathbb{R}\times \mathbb{R_+}$
+        \item $\mathcal{F}$ est lipschitzienne sur $[-K,K]^2$
+    \end{enumerate}
+
+    \vspace{1em}
+
+    Alors $u$ est solution faible du problème.
+    
+\end{theorem}
+\end{theorembox}
+
+Ce résultat nous sera utile pour démontrer le théorème de convergence que nous introduisons mainteant :
+
+\begin{theorembox}
+\begin{theorem}
+    \textbf{Convergence}
+    
+    Pour un schéma numérique conservatif approchant les solutions d'une loi de conservation, si :
+    \begin{enumerate}
+        \item Le flux numérique est lipschitzien pour ses deux variables et consistant avec le flux $f$
+        \item La condition initiale $u_0 \in \mathcal{C}^1$ est à support compact
+        \item Le schéma est TV-stable sur un intervalle $[0,T]$
+    \end{enumerate}
+    
+    Alors le schéma est convergent : 
+    $$\underset{h \rightarrow 0}{\lim} \ \text{dist}\big(u_h,\mathcal{W}\big) = 0$$
+\end{theorem}
+\end{theorembox}
+
+\begin{proof}
+    Supposons que $\text{dist}\big(u_h,\mathcal{W}\big)$ ne tend pas vers 0.
+    Alors il existe $\epsilon > 0$ et une sous-suite $(u_{h_j})_j$ telle que 
+    $$\text{dist}\big(u_{h_j},\mathcal{W}\big) > \epsilon, \quad \forall j \in \N$$
+
+    Puisque nous avons supposé le schéma TV-stable, alors $\forall j \in \N, \ u_{m_j} \in BV\big(\R \times [0,T]\big)$. 
+
+    \vspace{1em}
+    Par compacité de $BV\big(\R \times [0,T]\big)$ dans $L^1\big( \R \times [0,T]\big)$, il existe une sous suite $(\tilde{u}_{h_i})_i$ qui converge vers un certain $u \in BV\big( \R \times [0,T]\big)$ dans $L^1$
+
+    \vspace{1em}
+    Alors, à partir d'un certain rang $N \in \N, \ \forall i \geq N$,
+    $$\| \tilde{u}_{h_i} - u \|_{L^1} < \epsilon$$
+
+    \vspace{1em}
+
+    Or, sous ces hypothèses, en utilisant le théorème de Lax-Wendroff, nous savons que $u$ est une solution faible du problème de Cauchy, c'est à dire $u \in \mathcal{W}$.
+    
+    Ce qui contredit l'hypothèse initiale.
+    
+\end{proof}
+
+Nous avons déjà justifié précédemment que le schéma était TV-stable et consistant. Alors en prenant une condition initiale $\mathcal{C}^1$ à support compact, il ne reste qu'à montrer que le flux numérique est lipschitzien suivant ses deux variables.
+
+L'intervalle sur lequel nous appliquons la résolution numérique étant compact, et la condition initiale étant $\mathcal{C}^1$ à support compact, nous pouvons en déduire que la suite d'approximations produite par le schéma reste bornée.
+Nous allons montrer que le flux est lipschitzien sur tout compact :
+
+\vspace{1em}
+
+Soit $M\geq 0$ et $u,v \in [-M,M]$,
+
+\vspace{1em}
+
+On rappelle que le flux numérique est donné par $\mathcal{F}(u,v) = \frac{1}{2}\big(f(u) + f(v)\big) - \gamma(u,v)(v-u)$ avec $\gamma(u,v) = \max(|1 + u|,|1 + v|)$
+
+Nous allons différencier plusieurs cas possibles : $|1 + u| \geq |1 + v|$, $|1+u| \leq |1+v|$ et le signe de $1 + u$.
+
+\vspace{1em}
+
+Si $|1 + u| \geq |1 + v|$ et $1 + u \geq 0$ :
+
+$$\mathcal{F}(u,v) = \frac{1}{2}\big(f(u) + f(v)\big) - \frac{1 + u}{2}(v-u)$$
+$$\big| \partial_u\mathcal{F}(u,v) \big| = \bigg| 1 + \frac{3}{2}u - \frac{1}{2}v \bigg| \leq 1 + \frac{3}{2}M + \frac{1}{2}M = 1 + 2 M$$
+
+\vspace{1em}
+Si $|1 + u| \geq |1 + v|$ et $1 + u \leq 0$ :
+
+$$\mathcal{F}(u,v) = \frac{1}{2}\big(f(u) + f(v)\big) + \frac{1 + u}{2}(v-u)$$
+$$\big| \partial_u\mathcal{F}(u,v) \big| = \bigg| \frac{v}{2} - \frac{u}{2} \bigg| \leq M$$
+
+\vspace{1em}
+Si $|1 + u| \leq |1 + v|$ et $1 + u \geq 0$ :
+
+$$\mathcal{F}(u,v) = \frac{1}{2}\big(f(u) + f(v)\big) - \frac{1 + v}{2}(v-u)$$
+$$\big| \partial_u\mathcal{F}(u,v) \big| = \bigg| 1 + \frac{u}{2} - \frac{v}{2} \bigg| \leq 1 + 2M$$
+
+\vspace{1em}
+Si $|1 + u| \leq |1 + v|$ et $1 + u \leq 0$ :
+
+$$\mathcal{F}(u,v) = \frac{1}{2}\big(f(u) + f(v)\big) + \frac{1 + v}{2}(v-u)$$
+$$\big| \partial_u\mathcal{F}(u,v) \big| = \bigg| \frac{u}{2} + \frac{v}{2} \bigg| \leq M$$
+
+\vspace{1em}
+
+Ainsi, dans toutes les configurations possibles nous avons $|\partial_u\mathcal{F}(u,v)| \leq 1 + 2M$. Par l'inégalité des accroissements finis nous obtenons :
+
+$$\big| \mathcal{F}(u,v) - \mathcal{F}(w,v)\big| \leq (1 + 2M)|u - w|$$
+
+Le flux numérique est donc lipschitzien suivant $u$ sur $[-M,M]$.
+En procédant de la même manière pour $v$, nous obtenons la même inégalité d'accroissement pour $v$.
+
+Le flux numérique est lipschitzien suivant ses deux variables sur le compact $[-M,M]$. Nous pouvons alors choisir $M$ de sorte que $[a,b] \subset [-M,M]$, dans ce cas le flux numérique est lipschztien suivant ses deux variables sur tout le domaine de résolution numérique.
+
+\vspace{1em}
+
+Nous pouvons donc conclure que toutes les hypothèses du théorème de convergence sont satisfaites, alors le schéma est convergent.
+
+\section{Ordre supérieur avec la méthode MUSCL}
+
+Après avoir étudié le schéma hybride d'ordre 1, nous nous intéressons à la construction d'une méthode d'ordre supérieure. 
+Nous remarquons immédiatement que pour monter en ordre la partie différences finies ne pose pas de problèmes, il nous suffira d'y ajouter des noeuds d'approximation supplémentaires et déterminer les coefficients d'approximation. 
+Tout le travail ici va consister à introduire une méthode volumes finies d'ordre 2 et l'utiliser pour le flux de l'equation BBM. 
+Nous allons construire dans la suite du chapitre ce schéma monotone décentré amont (Monotonic Upstream-centered Scheme for Conservation Laws, MUSCL), en suivant la construction de \cite{Fabien_VF}, introduit pour la première fois par Bram Van Leer en 1979 dans le cadre de la mécanique des fluides numérique \cite{van-leer}. 
+
+\subsection{Construction à partir d'un problème linéaire}
+
+Pour construire cette méthode, nous allons d'abord nous intéresser au problème de transport linéaire $\partial_t u + c\partial_xu =0$.
+
+La méthode volume finis au sens de Godunov consiste en l'approximation de la moyenne de la solution sur chaque maille. La solution numérique est ainsi une fonction constante par morceaux. 
+L'idée de ce schéma est de construire une solution affine par morceaux, utilisant les valeurs moyennes de la solution numérique à chaque interface de maille.
+
+Nous allons faire une reconstruction linéaire de la solution numérique, puis nous nous intéresserons à l'évolution dans le temps et finalement au calcul explicite de cette nouvelle solution affine par morceaux.
+
+\vspace{1em}
+
+Soit $(u_i^n)_i$ les approximations constantes par cellules.
+
+On construit une fonction linéaire de la forme :
+$$\tilde{u}_i^n (t^n,x) = u_i^n + s_i^n(x - x_i), \quad \text{pour } x_{i-\frac{1}{2}} < x <x_{i+\frac{1}{2}} $$
+
+où $s_i^n$ est la pente choisie pour chaque cellule.
+
+On remarque que peu importe le choix de $s_i^n$, la méthode reste conservative, puisque nous avons $u_i^n = \frac{1}{\Delta x} \int_{\mathcal{C}_i}\tilde{u}_i^n dx$ :
+\begin{equation*}
+\begin{split}
+    \frac{1}{\Delta x} \int_{x_{i-\frac{1}{2}}}^{x_{i+\frac{1}{2}}} \tilde{u}^n(t^n,x) dx &= \frac{1}{\Delta x} \int_{x_{i- \frac{1}{2}}}^{x_{i+\frac{1}{2}}} u_i^n + s_i^n (x - x_i) dx \\
+    &= u_i^n + s_i^n\frac{1}{2\Delta x} \Bigl[ (x - x_i)^2 \Bigr]_{x_{i-\frac{1}{2}}}^{x_{i+\frac{1}{2}}} = u_i^n + s_i^n\frac{\Delta x^2 - \Delta x^2}{8\Delta x^2} = u_i^n
+\end{split}
+\end{equation*}
+
+Pour faire évoluer cette reconstruction linéaire dans le temps, avec le schéma de Godunov, puisque l'equation est linéaire, nous connaissons la solution du problème de Riemann, 
+$$\begin{cases}
+    \partial_tu + c\partial_xu = 0 \\
+    u(t^n,x) = \tilde{u}_i^n(t^n,x)
+\end{cases}$$
+
+La solution est transportée à vitesse $c$ sur un intervalle de temps 
+$\Delta t$ de $t^n$ à $t^{n+1}$.
+
+Ainsi nous avons :
+$$\tilde{u}_i^n(t^{n+1},x) = \tilde{u}_i^n(t^n,x - c\Delta t) \quad \forall x \in \mathcal{C}_i$$
+
+\vspace{1em}
+Maintenant nous retrouvons $u_i^{n+1}$ :
+
+Supposons dans un premier temps que $c>0$. Puisque la solution se déplace de la gauche vers la droite, pour éviter que la solution dépasse la maille $C_{i-1}$ on impose $c\Delta t \leq \Delta x$.
+
+La solution se décompose en une contribution sur $C_i$ et une autre sur $C_{i-1}$ entre $x_{i -\frac{1}{2}}$ et $x_{i -\frac{1}{2}} + c\Delta t$
+
+\begin{equation*}
+    \begin{split}
+        u_i^{n+1} &= \frac{1}{\Delta x} \int_{x_{i - \frac{1}{2}}}^{x_{i - \frac{1}{2}} + c\Delta t} u_{i-1}^n + s_{i-1}^n (x - c\Delta t -x_{i-1})dx + \frac{1}{\Delta x} \int_{x_{i - \frac{1}{2}} + c\Delta t}^{x_{i + \frac{1}{2}}} u_i^n + s_{i}^n (x - c\Delta t -x_i)dx \\
+        &= u_i^n - c\frac{\Delta t}{\Delta x} (u_i^n - u_{i-1}^n) - \frac{1}{2}c \frac{\Delta t}{\Delta x} (\Delta x - c \Delta t) (s_i^n - s_{i-1}^n)
+    \end{split}
+\end{equation*}
+
+Puis pour $c < 0$ : 
+
+$$u_i^{n+1} = u_i^n -c\frac{\Delta t}{\Delta x}(u_{i+1}^n - u_i^n) + \frac{1}{2}c\frac{\Delta t}{\Delta x}(\Delta x + c\Delta t)(s_{i+1}^n - s_i^n) $$
+
+\vspace{1em}
+
+On trouve alors le flux suivant :
+
+$$\mathcal{F}_{i - \frac{1}{2}} = \begin{cases}
+    cu_{i-1}^n + \frac{1}{2}c(\Delta x - c\Delta t)s_{i-1}^n \quad \text{si } c>0 \\
+    cu_i^n + \frac{1}{2}c(\Delta x + c\Delta x)s_i^n \quad \text{si } c<0
+\end{cases}$$
+
+Pour la pente $s_i^n$, il existe plusieurs possibilités, nous allons nous orienter vers une définition simple. C'est pourquoi nous faisons le choix de la pente dite upwind, 
+
+$$ s_i^n = \begin{cases}
+    \frac{u_i^n - u_{i-1}^n}{\Delta x} \quad \text{si } \quad c>0, \\
+    \frac{u_{i+1}^n - u_i^n}{\Delta x} \quad \text{si } \quad c<0
+\end{cases}$$
+
+Dans tous les cas, pour une définition simpliste de pente, nous 
+introduisons des perturbations dans la solution, qui se traduisent par la
+génération d'oscillations pour des données initiales discontinues.
+Lors de l'étape de reconstruction linéaire, le schéma upwind a perdu la propriété de monotonie du schéma volumes finis. 
+Il faut donc s'assurer que l'étape de reconstruction linéaire soit monotone afin de s'affranchir de ces oscillations.
+
+Pour cela nous devons adapter le comportement de la pente $s_i^n$.
+
+\vspace{1em}
+Par exemple, nous voulons que $s_i^n = 0$ lorsqu'un extremum est atteint dans la cellule $i$ et qu'il n'y ait pas de création de nouveaux extremas lorsque la solution varie rapidement.
+
+Cette situation d'extremum se traduit notamment par la condition $(u_i^n - u_{i-1}^n)(u_{i+1}^n - u_i^n) \leq 0$ (si $u_i^n$ est maximum alors $(u_i^n - u_{i-1}^n) \geq 0$ et $(u_{i+1}^n - u_i^n) \leq 0$ et inversement si $u_i^n$ est minimum).
+
+Pour obtenir de telles pentes, nous devons introduire des fonctions appelées "limiteurs de pentes". Il en existe une grande variété et nous nous concentrerons sur les cas simples.
+Nous pouvons par exemple introduire la fonction minmod définie comme suivant :
+
+$$\text{minmod(a,b)} = \begin{cases}
+    a \quad \text{si} \quad |a| < |b| \quad \text{et} \quad ab>0 \\
+    b \quad \text{si} \quad |b| < |a| \quad \text{et} \quad ab>0 \\
+    0 \quad \text{si} \quad ab \leq 0
+\end{cases}$$
+
+Et nous posons $s_i^n = \text{minmod}(\frac{u_i^n - u_{i-1}^n}{\Delta x}, \frac{u_{i+1}^n - u_i^n}{\Delta x})$
+
+\vspace{1em}
+Nous pouvons également introduire le limiteur de pente "Superbee" définit à partir de la fonction minmod et maxmod (définie comme minmod mais en changeant le signe de la condition sur $|a|$ et $|b|$):
+
+$$s_i^n = \text{maxmod}\Bigg(\text{minmod}\bigg[\frac{u_{i+1}^n - u_i^n}{\Delta x},2\frac{u_i^n - u_{i-1}^n}{\Delta x}\bigg],\text{minmod}\bigg[2\frac{u_{i+1}^n - u_i^n}{\Delta x},\frac{u_i^n - u_{i-1}^n}{\Delta x}\bigg]\Bigg)$$
+
+Si nous changeons d'approche et qu'au lieu de considérer les pentes pour chaque cellule $\mathcal{C}_i$ nous considérons les pentes pour chaque 
+interface $x_{i-\frac{1}{2}}$, nous obtenons une formulation différente utilisant cette fois des limiteurs de flux :
+A l'interface $x_{i-\frac{1}{2}}$, la solution numérique fait un saut de $\Delta u_{i-\frac{1}{2}} = u_i^n - u_{i-1}^n$ et donc $\frac{\Delta u_{i-{\frac{1}{2}}}}{\Delta x}$ 
+est une approximation de $\partial_xu(t^n,x_{i-\frac{1}{2}})$.
+
+Pour des raisons similaires à ce que nous avons évoqué précédemment, nous introduisons des fonctions $\phi$ que nous qualifions de limiteurs de flux. 
+Avec cette nouvelle définition, nous pouvons écrire le flux numérique sous la forme :
+
+$$\mathcal{F}_{i-\frac{1}{2}} = c^+u_{i-1}^n + c^-u_i^n + \frac{1}{2}|c|\biggl( 1 - \frac{\Delta t}{\Delta x} |c| \biggr)\phi(r_{i-\frac{1}{2}})\Delta u_{i-\frac{1}{2}}^n$$
+
+où $c^+ = \max(0,c)$ et $c^- = \min(0,c)$ et $r_{i-\frac{1}{2}}^n = 
+\begin{cases}
+    \frac{\Delta u_{i - \frac{3}{2}}^n}{\Delta u_{i - \frac{1}{2}}^n} \quad \text{si} \quad c>0 \\
+    \frac{\Delta u_{i + \frac{1}{2}}^n}{\Delta u_{i - \frac{1}{2}}^n} \quad \text{si} \quad c<0
+\end{cases} $
+
+Le ratio $r_{i-\frac{1}{2}}^n$ peut être vu comme un indicateur de régularité de la solution numérique au voisinage de l'interface $x_{i - \frac{1}{2}}$.
+Comme pour les limiteurs de pente, il existe une variété importante de choix de limiteurs de flux, motivés par des raisons différentes.
+
+Par exemple $\phi(r) = \text{minmod}(1,r)$ est le limiteur minmod, $\phi(r) = \max(0,\min(1,2r),\min(2,r))$ est le limiteur superbee 
+et $\phi(r) = \frac{r + |r|}{1 + |r|}$ est un limiteur introduit par Bram Van Leer.
+
+Avec cette reformulation, le schéma est TVD sous la CFL $c\frac{\Delta t}{\Delta x} \leq 1$.
+
+\subsection{Adaptation aux problèmes non linéaires et à BBM}
+
+\begin{definitionbox}
+\begin{definition}
+    On appelle reconstruction d'ordre 2 un opérateur agissant sur une suite d'approximations $(u_i^n)_{i\in \mathbb{Z}}$ et qui associe à chaque 
+    élément $\mathcal{C}_i$ deux approximations associées aux interfaces, que l'on note $u_{i+\frac{1}{2}}^{n,L}$ et $u_{i-\frac{1}{2}}^{n,R}$ et qui vérifie :
+
+    \begin{enumerate}
+        \item $$\frac{u_{i+\frac{1}{2}}^{n,L} + u_{i-\frac{1}{2}}^{n,R}}{2} = u_i^n$$
+        \item Si $\displaystyle u_i^n = \int_{\mathcal{C}_i} u(x) dx$ pour une certaine fonction régulière $u$, alors :
+        
+        $$u_{i+\frac{1}{2}}^{n,L} = u(x_{i+\frac{1}{2}}) + \mathcal{O}(\Delta x^2) \quad \text{et} \quad u_{i-\frac{1}{2}}^{n,R} = u(x_{i-\frac{1}{2}}) + \mathcal{O}(\Delta x^2)$$
+    \end{enumerate}
+\end{definition}
+\end{definitionbox}
+
+\vspace{1em}
+
+A partir de cette définition nous introduisons finalement le schéma volumes finis d'ordre 2, définit de la manière suivante :
+
+$$u_i^{n+1} = u_i^n - \frac{\Delta t}{\Delta x} \bigg( \mathcal{F}\Big(u_{i+\frac{1}{2}}^{n,L}, u_{i+\frac{1}{2}}^{n,R} \Big) - \mathcal{F}\Big(u_{i-\frac{1}{2}}^{n,L}, u_{i-\frac{1}{2}}^{n,R} \Big) \bigg)$$
+
+Le schéma d'ordre 2 s'écrit alors de la même façon que le schéma d'ordre 1, en remplaçant simplement les valeurs moyennes dans les flux numériques par les nouvelles valeurs calculées aux interfaces.
+
+Pour résumer l'approche de la méthode MUSCL, nous reconstruisons des états affines par morceaux sur chaques cellules en utilisant les valeurs moyennes constantes par morceaux du schéma d'ordre 1. Deux approches sont possibles : 
+
+\vspace{1em}
+\begin{enumerate}
+    \item Calculer la pente sur chaque cellule (avec une approximation de type upwind ou downwind par exemple) et utiliser un limiteur de pente (garantissant que le schéma reste monotone) pour ensuite retrouver les valeurs aux interfaces (en évaluant la reconstruction linéaire en $\pm \frac{\Delta x}{2}$) :
+
+    $$u_{i + \frac{1}{2}}^{n,L} = u_i^n + s_i^n \frac{\Delta x}{2}, \quad u_{i + \frac{1}{2}}^{n,R} = u_{i+1}^n - s_{i+1}^n \frac{\Delta x}{2}$$
+    
+    \item Calculer un flux approché de part et d'autre de chaques interfaces de cellules (encore une fois en utilisant des approximations upwind ou downwind) et utiliser un limiteur de flux pour garantir l'aspect TVD de la reconstruction.
+
+    $$u_{i + \frac{1}{2}}^{n,L} = u_i^n + \frac{1}{2} \phi(r_{i+\frac{1}2{}}) \Delta u_{i+\frac{1}{2}}, \quad u_{i + \frac{1}{2}}^{n,R} = u_{i+1}^n - \frac{1}{2} \phi(r_{i+\frac{1}2{}}) \Delta u_{i+\frac{1}{2}}$$
+    Avec $r_{i+\frac{1}{2}} = \frac{\Delta u_{i-\frac{1}{2}}}{\Delta u_{i + \frac{1}{2}}}$
+    
+\end{enumerate}
+
+Les deux approches s'intéressent à des points différents mais à la fin mènent à la même construction, en utilisant un limiteur de pente d'un côté et un limiteur de flux d'un autre.
+Dans la suite nous choisirons la deuxième approche.
+
+\vspace{1em}
+
+Dans le cadre de l'équation BBM, le flux s'écrit $f(u) = u + \frac{u^2}{2}$.
+Nous rappellons que le flux numérique est donné sous forme visqueuse par :
+$$\mathcal{F}(u,v) = \frac{1}{2}\big(f(u) + f(v)\big) - \frac{\gamma(u,v)}{2}(v-u)$$
+
+Avec $\gamma(u,v) = \max(|f'(u)|,|f'(v)|)$ par choix du flux de Rusanov.
+On notera dans la suite $\gamma_{i+\frac{1}{2}} = \max(|f'(u_i^n)|,|f'(u_{i+1}^n)|)$
+
+En adoptant les reconstructions de part et d'autre de chaque interface de cellule, et en choisissant le limiteur de flux de Van Leer $\phi(r) = \frac{r + |r|}{1 + |r|}$, nous pouvons écrire explicitement ce à quoi ressemble la reconstruction de chaque côté de l'interface $x_{i+\frac{1}{2}}$ :
+$$u_{i + \frac{1}{2}}^{n,L} = u_i^n + \frac{1}{2} \frac{r_{i+\frac{1}{2}} + \big|r_{i+\frac{1}{2}}\big|}{1 + \big|r_{i+\frac{1}{2}}\big|} \Delta u_{i+\frac{1}{2}}, \quad u_{i + \frac{1}{2}}^{n,R} = u_{i+1}^n - \frac{1}{2} \frac{r_{i+\frac{1}{2}} + \big|r_{i+\frac{1}{2}}\big|}{1 + \big|r_{i+\frac{1}{2}}\big|} \Delta u_{i+\frac{1}{2}}$$
+
+% Et la différence de flux numérique s'écrit :
+% $$\mathcal{F}\Big(u_{i + \frac{1}{2}}^{n,L},u_{i + \frac{1}{2}}^{n,R}\Big) - \mathcal{F}\Big(u_{i - \frac{1}{2}}^{n,L},u_{i - \frac{1}{2}}^{n,R}\Big) = \frac{1}{2}\Big(f\big(u_{i + \frac{1}{2}}^{n,R}\big) - (f\big(u_{i - \frac{1}{2}}^{n,L}\big) \Big) - \frac{1}{2}\Big( \gamma_{i+\frac{1}{2}} \big( u_{i + \frac{1}{2}}^{n,R} - u_{i + \frac{1}{2}}^{n,L} \big)  - \gamma_{i-\frac{1}{2}} \big( u_{i - \frac{1}{2}}^{n,R} - u_{i - \frac{1}{2}}^{n,L} \big) \Big)$$
+
+% Et le schéma d'ordre 2 pour le flux BBM (ou n'importe quel autre) s'écrit finalement :
+% $$u_i^{n+1} = u_i^n - \frac{\Delta t}{\Delta x} \biggl( \frac{1}{2}\Big(f\big(u_{i + \frac{1}{2}}^{n,R}\big) - (f\big(u_{i - \frac{1}{2}}^{n,L}\big) \Big) - \frac{1}{2}\Big( \gamma_{i+\frac{1}{2}} \big( u_{i + \frac{1}{2}}^{n,R} - u_{i + \frac{1}{2}}^{n,L} \big)  - \gamma_{i-\frac{1}{2}} \big( u_{i - \frac{1}{2}}^{n,R} - u_{i - \frac{1}{2}}^{n,L} \big) \Big) \biggr)$$
+
+Nous pouvons directement regrouper la partie volumes finis avec le terme dispersif du schéma hybride pour finalement retrouver un schéma d'ordre 2 en espace : 
+
+$$ \frac{u_i^{n+1} - u_i^n}{\Delta t} + \frac{\mathcal{F}\Big(u_{i + \frac{1}{2}}^{n,L},u_{i + \frac{1}{2}}^{n,R}\Big) - \mathcal{F}\Big(u_{i - \frac{1}{2}}^{n,L},u_{i - \frac{1}{2}}^{n,R}\Big)}{\Delta x} - \mathcal{D}_i^{n,n+1} = 0 $$
+
+Avec l'écriture sous forme de système d'équations algébrique, cela revient à reprendre l'équation vectorielle en modifant le vecteur flux :
+
+$$(I + \Delta_x)U^{n+1} = (I + \Delta_x)U^n - \Delta t \; \text{Flux*}(U^n)$$
+
+\vspace{1em}
+
+Où $\text{Flux*}(U^n) = \frac{1}{\Delta x}
+\begin{pmatrix}
+    \mathcal{F}\Big(u_{\frac{1}{2}}^{n,L},u_{\frac{1}{2}}^{n,R}\Big) - \mathcal{F}\Big(u_{- \frac{1}{2}}^{n,L},u_{- \frac{1}{2}}^{n,R}\Big) \\
+    \vdots \\
+    \mathcal{F}\Big(u_{N + \frac{3}{2}}^{n,L},u_{N + \frac{3}{2}}^{n,R}\Big) - \mathcal{F}\Big(u_{N + \frac{1}{2}}^{n,L},u_{N + \frac{1}{2}}^{n,R}\Big)
+\end{pmatrix}$
+
+\vspace{1em}
+
+En rappelant que nous choisissons des conditions périodiques au bord, nous avons $u_{-\frac{1}{2}}^n = u_{N+\frac{1}{2}}^n$ et $u_{N+\frac{3}{2}}^n = u_{\frac{1}{2}}^n$, et les reconstructions linéaires coïncident.
+
+
+\begin{remarkbox}
+\begin{remark}
+    Cette construction d'ordre 1 peut se généraliser à un ordre supérieur, l'idée centrale reste la même : utiliser les valeurs adjacentes constantes par morceaux pour reconstruire des états polynomiaux par morceaux (mais pas forcément continus). Cela peut rappeler l'idée du schéma Galerkin discontinu (DG) mais contrairement à ce dernier, le schéma MUSCL présente l'inconvénient de devoir utiliser des valeurs de plus en plus éloignées pour reconstruire une solution polynomiale sur une cellule. Cela mène à un travail supplémentaire concernant les conditions au bord du domaine. Pour des conditions périodiques il "suffira" d'utiliser les valeurs de l'autre côté du domaine, mais pour d'autres conditions, il faudra employer d'autres méthodes, par exemple en considérant des cellules "fantômes". Nous ne parlerons pas de ces méthodes, cela dépassant largement la portée de notre sujet.
+\end{remark}
+\end{remarkbox}
+
+
+
+
+
+
+% \section{Comparaison avec l'équation de Burgers}
+
+% Il peut être intéressant à ce stade d'étudier une comparaison avec l'équation de Burgers. Pour se faire on commence par remarquer que que l'équation BBM peut être réécrite de la manière suivante :
+
+% \begin{align*}
+%     &\partial_t u + \partial_x u + \partial_x u u - \partial_{xxt} u &= 0 \\
+%     \Leftrightarrow \quad & \partial_t u + \partial_x \left(u + \frac{1}{2}u^2\right) - \partial_{xxt} u &= 0
+% \end{align*}
+
+% On remarque que si on retire le terme de dispersion $\partial_{xxt} u$, on retrouve l'équation de Burgers :
+
+% \begin{equation*}
+%     \partial_t u + \partial_x \left(u + \frac{1}{2}u^2\right) = 0
+% \end{equation*}
+
+

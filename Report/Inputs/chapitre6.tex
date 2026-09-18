@@ -1,0 +1,96 @@
+\chapter{Simulations numériques}
+
+
+\section{Structure du code}
+
+Afin de mettre en pratique les modèles théoriques abordés dans les chapitres précédents, un code de simulation numérique à été développé dans le langage C++. Les hautes performances de ce langage ainsi que son paradigme de programation orienté objet en font un choix idéal pour ce type de projet.
+
+Notre première implementation du code de simulation numérique pour l'équation BBM était basée sur une architecture hybride combinant les méthodes de volumes finis pour la partie hyperbolique et les méthodes de différences finies pour la partie dispersive. Cette approche nous a permi d'obtenir des résultats satisfaisants pour des conditions initiales simples, notamment des ondes solitaires. Cependant, le principal défaut de cette architecture est l'ordre 1 en volumes finis et en temps pour la partie différences finies. En effet, l'approximation constante par morceaux du schéma d'odre 1 génère une forte dissipation numérique qui a tendance à applatir artificiellement l'onde au cours du temps. On constate donc que les ondes solitaires ont tendance à s'aplatir et à se déformer au cours du temps, ce qui n'est pas physiquement réaliste. Cela nous a naturellement conduit à un schéma d'ordre 2 pour améliorer la précision de nos simulations numériques.
+
+Afin d'améliorer notre schéma hybride classique volumes finis et différences finies, nous avons implémenté la méthode MUSCL afin d'avoir une reconstruction spatiale d'odre 2 et nous avons également, afin que l'entièreté de notre code soit d'ordre 2, implémenté la méthode de Runge-Kutta d'ordre 2 pour la discrétisation temporelle. Nous proposons d'expliquer rapidement les détails de la structure de ce code pour comprendre les choix d'implémentations, cette version là du code étant prise pour exemple car plus satisfaisante que la première version d'ordre 1 et moins complexe que le code utilisant la méthode de Galerkin discontinu.
+
+Pour la partie hyperbolique de l'équation, l'approximation constante par morceaux du schéma d'odre 1 génère une forte dissipation numérique qui a tendance à applatir artificiellement l'onde au cours du temps. Pour pallier à ce problème nous avons implémenté la méthode MUSCL. Nous avons choisi d'utiliser le limiteur de Van Leer détaillé précédement. On injecte ensuite ces résultats dans un flux de Rusanov pour calculer le flux numérique à l'interface où la vitesse maximale locale d'advection $\gamma$ est calculée à chaque itération en fonction de la dérivée du flux physique $f(u)$.
+
+Pour le terme dispersif mixte $-\partial_{xxt} u$, nous avons décidé d'augmenter l'ordre afin d'être en accord avec la partie hyperbolique. Comme explicité dans la partie théorique, l'équation s'écrit sous la forme :
+
+\begin{equation*}
+    \partial_t u + \partial_x \Big(u + \frac{1}{2}u^2\Big) - \partial_{xxt} u = 0
+\end{equation*}
+
+Qui nous donne en regroupant les termes :
+
+\begin{align*}
+    \partial_t u - \partial_{xx}^2 (\partial_t u) &= -\partial_x \Big(u + \frac{1}{2}u^2\Big)\\
+    (1 - \partial_{xx}^2) \partial_t u &= -\partial_x \Big(u + \frac{1}{2}u^2\Big)
+\end{align*}
+
+
+Le terme de droite $-\partial_x \big(u + \frac{1}{2}u^2\big)$ est calculé par la classe \texttt{residual} et le terme dispersif $(1 - \partial_{xx}^2)$ doit donc être inversé pour mettre à jour la solution. Pour cela nous utilisons la librairie \texttt{Eigen} qui propose des méthodes de résolution de système linéaires pour les matrices creuses. Pour résoudre ce système avec une précision accrue en temps tout en gérant l'inversion de l'opérateur elliptique, nous avons implémenté la méthode de Runge-Kutta d'ordre 2 couplée à une inversion implicite via \texttt{Eigen::SparseLU}. On détaille donc la décomposition de notre fonction d'assemblage et de mise à jour de la solution.
+Tout d'abord, avant même d'entrer dans la boucle, l'algorithme effectue une série de pré-calculs pour optimiser les performances. On commence par assembler la matrice creuse tridiagonale $A = I + \Delta_x$ correspondant à la discrétisation par différences finies de l'opérateur $(1 - \partial_{xx}^2)$. L'utilisation des \texttt{Eigen::Triplet} permet de gérer efficacement la construction de cette matrice en ne stockant que les éléments non nuls. Une fois assemblée, la matrice est factorisée une seule fois à l'aide de \texttt{Eigen::SparseLU}, ce qui permet d'optimiser grandement le temps de calcul lors des résolutions successives du système linéaire. En effet cette dernière ne dépendant pas du temps, il est inutile de la recalculer à chaque itération.
+On démarre ensuite la boucle dont on détaille les étapes à chaque itération :
+\begin{enumerate}
+    \item On appelle la classe \texttt{residual} pour calculer l'approximation spatiale du terme de flux advectif à partir de la solution courante $U^n$. On a donc $\text{Res}(U^n) \approx - \partial_x (u + \frac{1}{2}u^2)$.
+    \item On construit le vecteur second membre de l'étape de prédiction $b_{pred}$ en multipliant le résidu par le pas de temps $\Delta t$. On a donc $b_{pred} = \Delta t \cdot \text{Res}(U^n)$.
+    \item On résout ensuite le système linéaire afin d'obtenir le vecteur d'incrément de prédiction $\delta U_{pred}$ en utilisant la factorisation de la matrice $A$ préalablement calculée. On a donc $A \cdot \delta U_{pred} = b_{pred}$. 
+    \item On crée le champ temporaire $U^*$ correspondant à la solution intermédiaire de la méthode de Runge-Kutta d'ordre 2 : $U^* = U^n + \delta U_{pred}$.
+    \item On recalcule le résidu $\text{Res}(U^*)$ et on construit le second membre $b_{corr}$. On résout à nouveau le système linéaire $A \cdot \delta U_{corr} = b_{corr}$.
+    \item On met à jour le vecteur $U^{n+1}$ en combinant les deux étapes précédentes selon la formule de Runge-Kutta d'ordre 2 : $U^{n+1} = U^n + \frac{1}{2}(\delta U_{pred} + \delta U_{corr})$.
+\end{enumerate}
+
+L'emploi de la libraire \texttt{Eigen} pour la résolution du système linéaire permet d'assurer une grande efficacité et robustesse dans le calcul de l'inversion de l'opérateur elliptique, ce qui est crucial pour la stabilité et la précision de la méthode de Runge-Kutta d'ordre 2 dans ce contexte. De plus la durée d'éxécution est considérablement réduite par rapport à une implémentation manuelle de la factorisation et de la résolution du système linéaire, ce qui nous permet d'obtenir des résultats plus rapidement et d'explorer une plus grande variété de paramètres pour nos simulations numériques. On remarque que le passage de tout notre code à l'ordre 2 a permis d'obtenir des résultats plus précis et bien plus satisfaisants même sur des conditions initiales plus complexes que les simples ondes solitaires. Nous allons détailler les résultats obtenus dans la section suivante et comparer nos schèmas.
+
+
+\section{Résultats numériques}
+
+Afin de valider notre code et de comparer nos différents schémas, nous avons testé nos implémentations sur des conditions initiales. Afin de pouvoir comparer de façon pertinente nos schèmas, on se place dans le même cas pour les deux implémentations. On se place sur le domaine $[0,80]$ avec un maillage comportant $2000$ cellules. L'évolution temporelle est calculée sous condition CFL adaptative jusqu'à un temps final $T = 6$. On utilise comme condition initiale une onde solitaire solution de l'équation BBM donnée par la formule suivante :
+
+\begin{equation*}
+    u(x,0) = 3(c-1) \text{sech}^2\Big(\frac{1}{2}\sqrt{\frac{c - 1}{c}}(x - x_0)\Big)
+\end{equation*}
+
+Où $c$ est la vitesse de l'onde et $x_0$ sa position initiale. Nous avons choisi $c = 1.2$ et $x_0 = 25$ pour nos simulations.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Image/comparison1.png}
+    \caption{Résultats pour schéma hybride VF/DF}
+    \label{fig:fig3}
+\end{figure}
+
+On constate sur la Figure~\ref{fig:fig3} que le schéma hybride capture correctement la nature unidirectionnelle du transport dans le sens $+x$. L'onde s'est bien déplacée dans le sens attendu et la forme générale de l'onde est préservée. Cependant, le point critique relevé par cette figure réside dans l'évolution de l'amplitude de l'onde. On obeserve clairement une diminution de la hateur maximale du soliton au cours du temps. Ce lissage de la courbe est classique d'un schéma d'ordre 1 et est dû à la dissipation numérique introduite par l'approximation constante par morceaux. En effet, le schéma de Gudunov à l'ordre 1 génère une dissipation numérique qui ont tendance à applatir artificiellement l'onde au cours du temps.
+
+On peut maintenant comparer ce résultat avec celui obtenu à l'aide de la méthode MUSCL et de la méthode de Runge-Kutta d'ordre 2. Afin de mesurer concrètement le gain de précision on lance donc notre nouveau code en reproduisant la simulation numérique que précedement.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Image/comparison2.png}
+    \caption{Résultats pour MUSCL et RK2}
+    \label{fig:fig4}
+\end{figure}
+
+Le défaut majeur du schéma d'ordre 1 était la dissipation numérique qui a tendance à applatir artificiellement l'onde au cours du temps. En implémentant la méthode MUSCL pour la partie hyperbolique et la méthode de Runge-Kutta d'ordre 2 pour la partie temporelle, nous avons considérablement réduit cette dissipation numérique. Nous observons sur la Figure~\ref{fig:fig4} que l'amplitude maximale du soliton est beaucoup mieux préservée au cours du temps, ce qui est plus conforme à la nature physique de ces ondes. De plus, la forme générale de l'onde est également mieux conservée, avec moins de lissage et une meilleure capture des détails de la solution. Ces résultats confirment que le passage à un schéma d'ordre 2 a permis d'améliorer significativement la précision de nos simulations numériques pour l'équation BBM.
+
+\section{Analyse de l'erreur $L^2$}
+
+Afin de valider rigoureusement l'implémentation de nos méthodes et de vérifier qu'elles atteignent bien l'ordre de précision théorique, nous avons réalisé une analyse de l'erreur en norme $L^2$. Pour cela, nous avons comparé les solutions numériques obtenues avec un raffinement de maillage à la solution connu de BBM qu'est l'onde solitaire donnée plus haut. Les résultats sont tracés sur une échelle log-log et permettent de mesurer l'erreur en fonction du pas d'espace $\Delta x$. Les tests ont été réalisés pour des maillages de tailles $N = 500, 1000, 2000, 4000$ cellules. L'erreur en norme $L^2$ est calculée à l'état final. On présente donc la Figure~\ref{fig:fig5} qui présente l'erreur du schéma d'ordre 1 mélangeant volumes finis et différences finies.
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{Image/Convergence_L2.png}
+    \caption{Analyse de l'erreur en norme $L^2$ du schéma d'ordre 1}
+    \label{fig:fig5}
+\end{figure}
+
+Cette Figure~\ref{fig:fig5} confirme bien l'ordre 1 de notre schéma volumes finis et différences finies. Nous pouvons désormais introduire la Figure~\ref{fig:fig6} qui présente l'erreur du schéma d'ordre 2 mélangeant la méthode MUSCL et la méthode de Runge-Kutta d'ordre 2. Cette fois ci on effectue seulement les tests sur des maillages de taille $N = 250, 500, 1000$ car pour des maillages plus fins, l'erreur devient plus petite et potentiellement biaisée par la précision machine.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{Image/Convergence_L2_MUSCL_2.png}
+    \caption{Analyse de l'erreur en norme $L^2$ du schéma d'ordre 2}
+    \label{fig:fig6}
+\end{figure}
+
+
+
+
+

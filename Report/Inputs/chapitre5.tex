@@ -1,0 +1,498 @@
+\chapter{Construction d'une méthode Galerkin discontinu}
+
+Comme nous venons de le voir au chapitre précédent, une façon simple de gagner en ordre de convergence dans la partie volumes finis est d'utiliser le schéma MUSCL, qui reconstruit des états polynômiaux par morceaux à l'aide des valeurs dans les mailles voisines. L'avantage de cette méthode est sa facilité à être mise en oeuvre (sans rentrer dans le détail concernant les limiteurs de pente et de flux, qui forment à eux seul une théorie riche). La solution numérique va ainsi pouvoir gagner en précision au voisinage des parties régulières du domaine et limiter les imprécisions au voisinage des  chocs et fortes pentes (en dégradant l'approximation à l'ordre 1 dans ce cas de figure).
+L'inconvénient de cette méthode réside dans le fait que l'approximation sur une maille est dépendante des mailles voisines, plus l'ordre sera élevé, plus un nombre important de mailles rentreront en compte dans le calcul de la reconstruction polynômiale. En particulier au voisinage des bords cette méthode atteint des limites et il convient de faire des choix pour adapter le schéma (voir remarque à la fin de la partie dédiée au schéma MUSCL).
+
+Dans la suite nous souhaitons nous tourner vers une méthode permettant la gestion indépendante de chaque maille pour monter en ordre de façon efficace. 
+L'une des motivations de ce choix vient de l'océanographie. En effet lorsqu'il est question de modèles à grande échelle, la taille d'une maille dans un code de calcul peut correspondre à une centaine de kilomètres dans la réalité, car correspondant à l'échelle des longueurs d'ondes observées dans la majorité des situations. Dans le cas d'un schéma dissipatif nous ne pourrions pas correctement rendre compte du comportement du phénomène modélisé, à cause de pertes d'énergies artificielles (en raison d'erreurs de troncature ou de schémas décentrés) effançant ou lissant les fronts raides, les chocs et les discontinuités. L'une des solutions serait d'augmenter le nombre de cellules du maillage, mais au prix d'un calcul informatique long et coûteux qui n'est pas forcément nécessaire. Une autre solution serait de monter en ordre indépendamment sur chaque cellule afin de garantir la précision tout en maintenant un temps de calcul raisonnable. L'une des réponses élégantes à ce problème est la méthode Galerkin discontinu (dG) qui permet de construire une approximation polynômiale indépendante sur chaque maille, en évitant notamment la continuité aux interfaces. Cette approche va nous permettre, si besoin, de raffiner localement l'ordre d'approximation (sans influencer le calcul sur les mailles voisines) en fonction du comportement des vagues que nous considérerons
+
+Nous allons ici parler des notions de base concernant la méthode dG, dans un premier temps pour généraliser le schéma volumes finis dans la partie transport puis dans un second temps pour traiter le terme dispersif elliptique.
+
+
+\section{Généralisation des volumes finis pour la partie transport}
+
+On pose $\mathcal{P}^k$ l'ensemble des polynômes de dégré au plus $k$. Nous allons construire la méthode en supposant que nous cherchons une approximation de degré $k$ sur chaque maille. 
+Notons $\mathcal{T}_h$ l'ensemble des mailles. Dans notre cas, puisque nous sommes en dimension 1, $\mathcal{T}_h$ correspond à l'ensemble $\Big([x_{i-\frac{1}{2} },x_{i+\frac{1}{2}}[\Big)_{ 0 \leq i \leq N}$.
+L'espace d'approximation est donc $\mathcal{P}^k(T)$, l'espace des polynômes de degré au plus $k$ sur la maille $T$, et plus généralement sur le domaine l'espace d'approximation est $\mathcal{P}^k(\Omega) = \Big\{ v_h \in L^2(\Omega) \ | \ \forall T \in \mathcal{T}_h, \ v_{h|T} \in \mathcal{P}^k(T) \Big\}$
+
+Nous cherchons une solution numérique de la forme : 
+
+$$ u_h(x,t) = \sum_{T \in \mathcal{T}_h}\sum_{i =0}^{k} u_i^T(t)\phi_i^T(x)$$
+
+Où $u_i^T$ est la solution numérique dont le support est $T$. Nous décomposons ainsi $u_h$ en une somme de fonctions dont le support est inclus dans chaque maille $T \in \mathcal{T}_h$.
+
+Nous allons travailler sur l'expression de $u^T$, la contribution sur $T$ de la solution numérique.
+A l'instar de la méthode des éléments finis, nous souhaitons décomposer $u^T$ à l'aide d'une base de polynômes $\big\{ \phi_0^T, \phi_1^T, \dots,\phi_k^T \big\}$.
+
+Un choix de base raisonnable serait les polynômes de Tchebychev, définis par réccurence de la façon suivante :
+
+$$\begin{cases}
+    P_0(X) = 1 \\
+    P_1(X) = X \\
+    P_{n+2}(X) = 2XP_{n+1}(X) - P_n, \quad \forall n\in \mathbb{N}
+\end{cases}$$
+
+\vspace{1em}
+
+Les premiers éléments de la suite sont donnés par :
+
+$\begin{cases}
+    P_0(X) = 1 \\
+    P_1(X) = X \\
+    P_2(X) = 2X^2 -1 \\
+    P_3(X) = 4X^3 - 3X \\
+    P_4(X) = 8X^4 - 8X^2 + 1 \\
+    \quad \vdots
+\end{cases}$
+
+\vspace{1em}
+
+Un tel choix est motivé par la stabilité et la minimisation d'oscillations (phénonème de Runge) dans l'interpolation de fonctions en utilisant des polynômes de Tchebychev d'ordre élevé. 
+De plus leur relation de reccurence étant assez simple, il est facile de déterminer les fonctions de base d'un espace étant donné un degré d'interpolation.
+
+Nous pouvons écrire $u^T$ sous la forme :
+
+$$u^T = \sum_{i=0}^{k} u_i^T \phi_i^T$$
+
+Considérons la loi de conservation suivante : 
+
+$$\partial_t u + \partial_x F(u) = 0$$
+Où $F$ est un flux quelconque. 
+
+Soit $v$ une fonction test régulière sur le domaine, nous établissons la formulation faible de l'équation, pour le moment sans nous soucier de la méthode dG :
+
+\begin{equation*}
+\begin{split}
+    \int_T  \partial_t u v + \partial_x F(u)v \ dx =0 \\
+    \Leftrightarrow \frac{d}{dt}\int_T uv \ dx - \int_T F(u)\partial_x v \ dx + \int_{\partial T} \big(F(u)\cdot n_T \big)v \ dx = 0
+\end{split}
+\end{equation*}
+
+Où $n_T$ est la normale sortante à $T$.
+En prenant en compte le fait que $T = \big[x_{q-\frac{1}{2}}, x_{q+\frac{1}{2}} \big]$, la formulation faible devient :
+
+$$\frac{d}{dt}\int_{x_{q-\frac{1}{2}}}^{x_{q+\frac{1}{2}}} uv \ dx - \int_{x_{q-\frac{1}{2}}}^{x_{q+\frac{1}{2}}} F(u)\partial_xv \ dx + \Big[ F(u)v \Big]_{x_{q-\frac{1}{2}}}^{x_{q+\frac{1}{2}}} = 0 $$
+
+Nous voudrions maintenant pouvoir remplacer $u$ par $u_h$ et $v$ par $v_h$ dans l'équation précedente, avec $u_h,v_h \in \mathcal{P}^k(\Omega)$. 
+Nous ne pouvons pas directement faire ce remplacement étant donné que la méthode que nous souhaitons construire se base sur l'indépendance de l'approximation sur chaque cellule, et donc que la continuité n'est plus imposée. Cela signifie qu'il n'y a pas de raison pour que l'on se retrouve avec $u_h\big(x^+_{i+\frac{1}{2}},t \big) = u_h\big( x^-_{i + \frac{1}{2}} ,t \big)$, où $x^{\pm}_{i + \frac{1}{2}}$ désigne le côté gauche ou droite de l'interface $x_{i+\frac{1}{2}}$.
+
+A l'instar de la méthode des volumes finis, nous introduisons alors le flux numérique $\widehat{F}_{i+\frac{1}{2}}$ à travers l'interface $x_{i+\frac{1}{2}}$. 
+
+% \begin{equation*}
+% \begin{split}
+%     \int_T \partial_tu^Tv \ dx + \int_T \partial_xF\big(u^T\big)v \ dx &= 0 \\
+%     \Leftrightarrow \int_T \frac{d}{dt} \Big( \sum_{i=0}^{k} u_i^T \phi_i^T \Big)v \ dx + \int_T \partial_x\Big( \sum_{i=0}^{k} F_i^T \phi_i^T \Big) v \ dx &= 0 \\
+%     \Leftrightarrow \sum_{i=0}^{k} \frac{d}{dt} u_i^T \int_T \phi_i^T v \ dx + \int_T \partial_x\Big(\sum_{i = 0}^{k} F_i^T \phi_i^T\Big)v \ dx &= 0
+% \end{split}
+% \end{equation*}
+
+% Où $F_i^T = F\big(u_i^T\big)$.
+
+% En prenant $v = \phi_j^T$ pour $j \in \{0,\dots,k\}$ puis en intégrant par parties : 
+
+% $$\sum_{i=0}^{k} \frac{d}{dt} u_i^T \int_T \phi_i^T \phi_j^T \ dx - \sum_{i = 0}^{k} \int_T F_i^T \phi_i^T \partial_x\phi_j^T \ dx + \sum_{i=0}^{k} \int_{\partial T} F_i^h \phi_i^T \big(\phi_j^T \cdot n_T \big) \ ds = 0$$
+
+% Or $T = [x_i, x_{i+1}[$. L'équation devient :
+
+% $$\sum_{i=0}^{k} \frac{d}{dt} u_i^T \int_{x_i}^{x_{i+1}} \phi_i^T \phi_j^T \ dx - \sum_{i = 0}^{k} \int_{x_i}^{x_{i+1}} F_i^T \phi_i^T \partial_x\phi_j^T \ dx + \Big[F_i^h \phi_i^T \phi_j^T \Big]_{x_i}^{x_{i+1}} = 0$$
+
+\vspace{1em}
+
+Plusieurs choix sont possibles pour la définition du flux numérique, nous pousons choisir le flux de Lax-Friedrichs (LF) global de la forme $F^{LF}(u^+,v^-) = \frac{1}{2}\big(F(u^-) + F(v^+)\big) - \frac{\gamma^{LF}}{2}\big(u^+ - u^-\big)$, avec $\gamma^{LF} = \underset{0\leq j \leq N}{|F'(u)|}$. Nous écrivons alors :
+
+$$\begin{cases}
+    \widehat{F}_{q +\frac{1}{2}} = F^{LF}\Big(u^{T_{q+1}}\big(x_{q+\frac{1}{2}},t \big),u^{T_{q}}\big(x_{q+\frac{1}{2}},t \big)\Big) \\
+    \widehat{F}_{q -\frac{1}{2}} = F^{LF}\Big(u^{T_q}\big(x_{q-\frac{1}{2}},t \big),u^{T_{q-1}}\big(x_{q-\frac{1}{2}},t \big)\Big)
+\end{cases}$$
+
+Nous pouvons maintenant reprendre la formulation variationnelle et l'écrire pour $u_h$ et $v_h$ dans $\mathcal{P}^k(T_q)$ pour $T_q \in \mathcal{T}_h$.
+
+$$\frac{d}{dt}\int_{x_{q-\frac{1}{2}}}^{x_{q+\frac{1}{2}}} u^{T_q}v_h \ dx - \int_{x_{q-\frac{1}{2}}}^{x_{q+\frac{1}{2}}} F(u^{T_q})\partial_xv_h \ dx + \Big[ \widehat{F}\big(u^{T_q}\big)v_h \Big]_{x_{q-\frac{1}{2}}}^{x_{q+\frac{1}{2}}} = 0 $$
+
+\begin{remarkbox}
+\begin{remark}
+    En prenant le degré $k = 0$, les fonctions de bases sont données par $v_h = 1$. Nous retrouvons ainsi la méthode des volumes finis pour une loi de conservation scalaire.
+\end{remark}
+\end{remarkbox}
+
+\vspace{1em}
+
+En choisissant $v_h = \phi_j^{T_q}$, pour $j \in \{0,\dots,k\}$ :
+
+$$\frac{d}{dt}\int_{x_{q-\frac{1}{2}}}^{x_{q+\frac{1}{2}}} u^{T_q}\phi_j^{T_q} \ dx - \int_{x_{q-\frac{1}{2}}}^{x_{q+\frac{1}{2}}} F(u^{T_q})\partial_x\phi_j^{T_q} \ dx + \widehat{F}_{q+\frac{1}{2}}\phi_j^{T_q}(x_{q+\frac{1}{2}}) - \widehat{F}_{q-\frac{1}{2}}\phi_j^{T_q}(x_{q-\frac{1}{2}}) = 0 $$
+
+Sur la maille $T_q$, la solution numérique se décompose de la façon suivante, $u^{T_q}(x,t) = \sum_{i=0}^{k} u_i^{T_q}(t)\phi_i^{T_q}(x)$.
+
+En utilisant cette décomposition dans la base $\Big(\phi_i^{T_q}\Big)_{0\leq i \leq k}$ dans la formulation variationnelle nous obtenons :
+
+$$\sum_{i=0}^{k} \frac{d}{dt}  u_i^{T_q} \int_{x_{q-\frac{1}{2}}}^{x_{q+\frac{1}{2}}} \phi_i^{T_q} \phi_j^{T_q} \ dx - \sum_{i=0}^{k} \int_{x_{q-\frac{1}{2}}}^{x_{q+\frac{1}{2}}} F_i\phi_i^{T_q}\partial_x\phi_j^{T_q} \ dx + \widehat{F}_{q+\frac{1}{2}}\phi_j^{T_q}(x_{q+\frac{1}{2}}) - \widehat{F}_{q-\frac{1}{2}}\phi_j^{T_q}(x_{q-\frac{1}{2}}) = 0$$
+Nous introduisons la matrice de masse associée à la maille $T_q$ notée $M^{T_q}$ et définie par :
+$$M^{T_q}_{ij} = \int_T \phi_i^{T_q} \phi_j^{T_q} \ dx, \quad \forall (i,j) \in \llbracket 1, k \rrbracket$$
+
+Ainsi que la matrice de convection sur la maille $T_q$, notée $C^{T_q}$ :
+
+$$C^{T_q}_{ij} = \int_T \partial_x \phi_i^{T_q} \phi_j^{T_q} \ dx, \quad \forall (i,j) \in \llbracket 1, k \rrbracket $$
+
+On définit le vecteur flux numérique aux bords de la maille $T_q$ par :
+$$F^{\partial T_q}_j = \widehat{F}_{q+\frac{1}{2}}\phi_j^{T_q}(x_{q+\frac{1}{2}}) - \widehat{F}_{q-\frac{1}{2}}\phi_j^{T_q}(x_{q-\frac{1}{2}}), \quad \forall j\in \llbracket 0,k \llbracket $$
+
+Le schéma semi discret s'écrit finalement sous la forme d'un système d'équations algébriques sur la maille $T_q$:
+
+$$\sum_{i=0}^{k} \frac{d}{dt}\big(u^{T_q}\big)_i \big(M^{T_q}\big)_{ij} - \sum_{i = 0}^{k} F^{T_q}_i C^{T^\mathsf{T}}_{ij} + F^{\partial T_q}_j = 0, \quad \forall j \in \llbracket 0,k \rrbracket $$
+
+\begin{equation*}
+\begin{split}
+    \Leftrightarrow M^{T_q} \frac{d}{dt}u^{T_q} - C^{{T_q}^\mathsf{T}} F^{T_q} + F^{\partial T_q} = 0 \\
+    \Leftrightarrow \frac{d}{dt}u^{T_q} = \Big(M^{T_q}\Big)^{-1} \Big( C^{{T_q}^\mathsf{T}} F^{T_q} - F^{\partial T_q} \Big)
+\end{split}
+\end{equation*}
+
+Cette formulation est locale, nous pouvons l'étendre au maillage entier en considérant des matrices diagonales par bloc, construites par la concaténation des différentes matrices locales, idem pour les vecteurs de flux.
+La formulation globale s'écrit donc :
+$$M\frac{d}{dt}U = C^{\mathsf{T}}F(U) - \widehat{F}(U)$$
+
+Nous obtenons ainsi (de manière formelle sans détailler les propriétés des matrices) un schéma dG semi discret pour la partie hyberbolique de l'équation, généralisant le schéma volume finis à l'ordre $k$.
+
+Un large choix de méthodes numériques s'offre à nous pour faire évoluer la solution en temps. Nous pouvons choisir un schéma d'Euler explicite dans un premier temps, puis monter en ordre par des méthodes Runge et Kutta d'ordre supérieur.
+
+En pratique nous choisirons $k = 1$ afin d'obtenir une solution approchée comparable à ce que nous avons pu faire avec le schéma MUSCL. Nous ne détaillerons pas les estimations d'erreurs ici, ce chapitre étant dédié à une brève introduction aux méthodes de Galerkin discontinu.
+
+Notons que l'utilisation d'un limiteur de pente peut être nécessaire en fonction du problème considéré. En effet, une solution avec de fortes pentes et/ou un gradient raide pourrait mener à un phénomène de Gibbs, amenant de fortes instabilités
+au voisinage de chocs ou de discontinuités. De la même façon que pour la méthode MUSCL, nous souhaitons limiter l'apparition de nouveaux extremas à l'interface des cellules, pour cette raison nous appliquerons un limiteur mindmod à chaque itération pour éviter des oscillations parasites
+dans le profil de la solution.
+
+
+\section{Introduction à la méthode IP-dG pour la partie dispersive}
+
+Dans cette partie nous allons nous pencher sur le traitement du terme dispersif de l'équation BBM $-\partial_{txx}u$.
+
+Une façon de reprendre avec l'introduction précédente aux méthodes de Galerkin discontinu pour les lois de conservation serait de traiter ce terme dispersif à l'aide d'une autre méthode dG.
+La méthode que nous allons brièvement introduire est une adaptation des méthodes dG aux problèmes elliptiques, connue sous le nom de \textit{interior penalty discontinuous Galerkin} (IP-dG).
+
+\vspace{1em}
+
+% Puisqu'ici il est question de traiter le terme elliptique de l'équation, nous allons établir la formulation variationnelle pour le problème de poisson modifié suivant avec conditions périodiques au bord :
+
+% $$\begin{cases}
+%     -\partial_{txx}u = 0 &\text{sur } \Omega = ]a,b[ \\
+%     u(a) = u(b)
+% \end{cases}$$
+
+% Posons $V$ l'espace fonctionnel des fonctions de $H^1(\Omega)$ périodiques sur le domaine.
+
+Considérons le problème de Poisson avec conditions de Dirichlet homogène :
+$$\begin{cases}
+    \Delta u = f &\text{ dans } \Omega \\
+    u_{|\partial \Omega} = 0
+\end{cases}$$
+
+Dont la formulation variationnelle est donnée par :
+$$\text{Trouver } u\in H^1_0(\Omega) \text{ tel que } \forall v\in H^1_0(\Omega), \ \int_{\Omega} \nabla u \cdot \nabla v \ dx = \int_{\Omega} fv \ dx $$
+
+Notons $\displaystyle a(u,v) := \int_{\Omega} \nabla u \cdot \nabla v \ dx$ la forme bilinéaire sur $V := H^1_0(\Omega) = \big\{ v \in H^1(\Omega) \ \big | \ v_{|\partial \Omega} = 0 \big\} $ et $\displaystyle l(v) := \int_{\Omega} fv \ dx$ forme linéaire sur $V$ associées à la formulation variationnelle.
+
+\vspace{1em}
+Une façon simple de montrer que le problème est bien posé (existence, unicité et dépendance continue de la solution aux données du problème) serait d'utiliser le théorème de Lax-Milgram, qui 
+requiert les conditions suivantes sur les formes linéaires et bilinéaires $l$ et $a$ :
+\begin{enumerate}
+    \item $l : V \to \R$ doit être une forme linéaire continue sur $V$ 
+    \item $a : V \times V \to \R $ doit être une forme bilinéaire continue sur $V \times V$
+    \item $a$ doit être coercive, c'est à dire $\exists \alpha > 0, \ \forall v \in V, \ a(v,v) \geq \alpha \| v \|_{V}^2$
+\end{enumerate}
+
+Nous pouvons réecrire le problème de Poisson sous une forme de problème mixte en voyant $u$ comme un potentiel :
+
+$$\begin{cases}
+    \sigma + \nabla u = 0 & \text{ dans } \Omega \\
+    \nabla \cdot \sigma = f & \text{ dans } \Omega
+\end{cases}$$
+Nous appelons $\sigma$ le flux diffusif.
+
+La construction de la méthode dG pour ce type de problème repose sur le fait que sur un certain maillage $\mathcal{T}_h$, 
+le potentiel et les composantes normales du flux diffusif disparaissent à travers les interfaces. 
+
+\vspace{1em}
+
+Nous introduisons les notations suivantes respectivement pourles moyennes et les sauts à travers chaque interface :
+$$\{v\}_{x_k} = \frac{1}{2}\Big(v(x_k^+) + v(x_k^-)\Big) \ \text{ et } \ \llbracket v \rrbracket_{x_k} = v(x_k^+) - v(x_k^-)$$
+
+Nous utilisons $V_h = \mathcal{P}^k(\mathcal{T}_h)$ l'espace d'approximation. 
+On pose $V_{*} = V \cap H^2(\Omega)$ l'espace auquel la solution exacte devrait appartenir \cite{dG} et on pose $V_{*h} = V_{*} + V_h$.
+
+Dans la suite du raisonnement nous utiliserons ce lemme sur les sauts de potentiel et flux diffusifs pour vérifier la consistance de $a_h$ :
+\begin{lemmabox}
+\begin{lemma}
+    Si $u\in V \cap W^{2,1}(\Omega)$, alors :
+    \begin{enumerate}
+        \item $\llbracket u \rrbracket = 0$, $\quad \forall F \in \mathcal{F}_h$
+        \item $\llbracket \sigma \cdot n_F \rrbracket = 0$, $\quad \forall F \in \mathcal{F}_h^i$
+    \end{enumerate}
+\end{lemma}
+\end{lemmabox}
+Où $\mathcal{F}_h$ est l'ensemble des faces du maillage et $\mathcal{F}_h^i$ est l'ensemble des faces intérieures du maillage
+
+La forme bilinéaire discrète est définie pour $(v,w_h)\in V_{*h}\times V_h$ par :
+$$a_h(v,w_h) = \int_{\Omega} \nabla_h v \cdot \nabla_h w_h \ dx = \sum_{T \in \mathcal{T}_h}\int_T \nabla v \cdot \nabla w_h \ dx $$
+Avec le gradient discret définit de la manière suivante $(\nabla_h v)_{|T} = \nabla (v_{|T})$.
+
+Dans le formalisme de la méthode des éléments finis et des méthodes de Galerkin, la consistance est donnée par la propriété suivante :
+
+\begin{definitionbox}
+\begin{definition}
+    On dit que le problème discret est consistant si pour la solution exacte $u \in V_{*h}$ :
+    $$ a_h(u,w_h) = l(w_h), \ \forall w_h \in V_h $$
+\end{definition}
+\end{definitionbox}
+Les conditions du théorème de Lax-Milgram ne sont plus satisfaites pour le problème discret, nous allons ainsi reconstruire une forme bilinéaire discrète satisfaisant les conditions de coercivité et de consistance.
+
+Afin d'examiner la consistance de l'application bilinéaire, nous intégrons par partie sur chaque élément de maillage :
+
+$$a_h(v,w_h) = - \sum_{T \in \mathcal{T}_h} \int_{T} \Delta v w_h \ dx + \sum_{T \in \mathcal{T}_h} \int_{\partial T } (\nabla v \cdot n_T) w_h \ ds $$
+
+Le terme de bord peut s'écrire de la manière suivante :
+
+$$\sum_{T \in \mathcal{T}_h} \int_{\partial T} (\nabla v \cdot n_T)w_h \ ds = \sum_{F \in \mathcal{F}_h^i} \int_F \llbracket \nabla_h v w_h \rrbracket \cdot n_F \ ds + \sum_{F \in \mathcal{F}_h^b}\int_F (\nabla v \cdot n_F)w_h \ ds$$
+
+Où $\mathcal{F}_h^b$ est l'ensemble des faces extérieures du maillage.
+Or,
+$$\llbracket (\nabla_h v)w_h \rrbracket = \{ \nabla_hv \} \llbracket w_h \rrbracket + \llbracket \nabla_h v \rrbracket \{w_h\} $$
+
+Le terme de bord s'écrit alors :
+\begin{equation*}
+\begin{split}
+    \sum_{T \in \mathcal{T}_h} \int_{\partial T} (\nabla v \cdot n_T)w_h \ ds &= \sum_{F \in \mathcal{F}_h} \int_F \{ \nabla_hv \} \cdot n_F \llbracket w_h \rrbracket + \llbracket \nabla_h v \cdot n_F \rrbracket \{w_h\} \ ds + \sum_{F \in \mathcal{F}_h^b}\int_F (\nabla v \cdot n_F)w_h \ ds \\
+    &= \sum_{F \in \mathcal{F}_h} \int_F \{ \nabla_hv \} \cdot n_F \llbracket w_h \rrbracket \ ds + \sum_{F \in \mathcal{F}_h^i} \int_F \llbracket \nabla_h v \rrbracket \cdot n_F \{w_h\} \ ds \ \ (w_{h|\partial \Omega} = 0)
+\end{split}
+\end{equation*}
+Et l'application bilinéaire s'écrit finalement :
+\begin{equation}
+    a_h(v,w_h) = -\sum_{T \in \mathcal{T}_h} \int_F \Delta v w_h \ dx +  \sum_{F \in \mathcal{F}_h} \int_F \{ \nabla_hv \} \cdot n_F \llbracket w_h \rrbracket \ ds + \sum_{F \in \mathcal{F}_h^i} \int_F \llbracket \nabla_h v \rrbracket \cdot n_F \{w_h\} \ ds \label{consistance}
+\end{equation}
+
+Pour vérifier la consistance, on prend $v = u$, solution exacte du problème discret, et on obtient :
+$$a_h(u,w_h) = \int_{\Omega}fw_h \ dx + \sum_{F \in \mathcal{F}_h} \int_F (\nabla u \cdot n_F) \llbracket w_h \rrbracket \ ds $$
+
+Nous modifions ainsi la forme bilinéaire $a_h$ pour satisfaire la consistance de la façon suivante,
+$$a_h^{\text{c}}(v,w_h) := \int_{\Omega} \nabla_h v \cdot \nabla_h w_h \ dx - \sum_{F \in \mathcal{F}_h} \int_F \{ \nabla_h v \} \cdot n_F \llbracket w_h \rrbracket \ ds $$
+De cette façon nous avons $a_h^{\text{c}}(u,w_h) = \int_{\Omega} fw_h \ ds$ et la consistance est vérifiée.
+
+Nous souhaitons maintenant retrouver la symétrie pour $a_h^{\text{c}}$, comme naturellement présente sur la formulation variationnelle continue. 
+Une façon d'y parvenir se fait un modifiant une nouvelle fois la forme $a_h^{\text{c}}$ en y ajoutant un terme qui n'impacte pas la consistance.
+
+On définit une nouvelle forme bilinéaire discrète de la façon suivante :
+\begin{equation}
+    a_h^{\text{cs}}(v,w_h) = \int_{\Omega} \nabla_h v \cdot \nabla_h w_h \ dx - \sum_{F \in \mathcal{F}_h} \int_F \Big( \{ \nabla_h v \} \cdot n_F \llbracket w_h \rrbracket + \llbracket v \rrbracket \{ \nabla_h w_h \} \cdot n_F \Big) \ ds \label{symétrie}
+\end{equation}
+Ou de façon équivalente en réutilisant l'expression de \ref{consistance} :
+$$a_h^{\text{cs}}(v,w_h) = -\sum_{T \in \mathcal{T}_h}\int_T \Delta v w_h \ dx + \sum_{F \in \mathcal{F}_h^i} \int_{F} \llbracket \nabla_h v \rrbracket \cdot n_F \{w_h\} \ ds - \sum_{F \in \mathcal{F}_h} \int_F \llbracket v \rrbracket \{ \nabla_h w_h \} \cdot n_F \ ds $$
+
+Maintenant sous souhaiterions que la forme bilinéaire discrète satisfasse la condition de coercivité.
+Vérifions la coercivité sur $V_h$ avec $a_h^{\text{cs}}$ telle que nous l'avons définie pour l'instant, soit $v_h \in V_h$ :
+
+$$a_h^{\text{cs}}(v_h,v_h) = \|\nabla_h v_h\|_{L^2(\Omega)}^2 - 2 \sum_{F \in \mathcal{F}_h} \int_F \{ \nabla_h v_h \} \cdot n_F \llbracket v_h \rrbracket \ ds $$
+
+Nous remarquons qu'en l'état, le second terme du côté droit de l'égalité n'a pas de signe définit, et ainsi sans ajouter de nouveau terme nous ne pouvons pas espérer obtenir la coercivité discrète.
+Une façon de garantir la coercivité discrète se fait en ajoutant un terme pénalisant les sauts aux interfaces et aux bords.
+Pour $(v,w_h) \in V_{*h}\times V$ nous posons :
+$$a_h^{\text{sip}} := a_h^{\text{cs}}(v,w_h) + s_h(v,w_h) $$
+Où le terme de stabilisation $s_h$ est définit par : 
+$$s_h(v,w_h) = \sum_{F \in \mathcal{F}_h} \frac{\eta}{h_F} \int_F \llbracket v \rrbracket \llbracket w_h \rrbracket \ ds $$
+Avec $\eta > 0$ un terme de pénalisation fixé par l'utilisateur et $h_F$ est une échelle de taille locale à la face du maillage $F \in \mathcal{F}_h$.
+
+Nous introduisons la définition suivante pour $h_F$, adaptée à l'application que nous ferons en dimension 1 :
+\begin{definitionbox}
+\begin{definition}
+    En dimension 1, $h_F = \min(h_{T_1},h_{T_2})$ si $F \in \mathcal{F}_h^i$ avec $F = \partial T_1 \cap \partial T_2$ et $h_F = h_T$ si $F \in \mathcal{F}_h^b$ avec $F = \partial T \cap \partial \Omega$. Où $h_T$ correspond au diamètre de la maille de la maille $T \in \mathcal{T}_h$.
+\end{definition}
+\end{definitionbox}
+
+En conclusion de cette dérivation, nous obtenons la forme bilinéaire discrète suivante, satisfaisant les conditions de consistance et coercivité et étant de plus symétrique, pour $(v,w_h) \in V_{*h} \times V_h$
+
+\begin{equation}
+\begin{split}
+    a_h^{\text{sip}}(v,w_h) = \int_{\Omega} \nabla_h v \cdot \nabla_h w_h \ dx &- \sum_{F \in \mathcal{F}_h} \int_F \Big( \{ \nabla_h v \} \cdot n_F \llbracket w_h \rrbracket + \llbracket v \rrbracket \{ \nabla_h w_h \} \cdot n_F \Big) \ ds \\
+    &+ \sum_{F \in \mathcal{F}_h} \frac{\eta}{h_F} \int_F \llbracket v \rrbracket \llbracket w_h \rrbracket \ ds
+\end{split}
+\end{equation}
+
+
+\section{Construction d'un schéma pour BBM}
+
+Revenons maintenant à l'équation BBM. Rappelons que cette dernière s'écrit :
+$$\partial_t u + \partial_x\Big( u + \frac{1}{2}u^2 \Big) - \partial_{txx}u = 0$$
+Ou encore :
+$$\partial_t u - \partial_{xxt}u + \partial_x f(u) = 0$$
+
+
+\subsection{Système couplé}
+
+Une façon de réecrire cette équation se fait de la manière suivante :
+$$\begin{cases}
+    \partial_t u = v\\
+    (1 - \partial_{xx})v + \partial_x f(u) = 0
+\end{cases}$$
+
+De cette manière, nous allons traiter indépendement la résolution spatiale et l'avancement en temps.
+L'essentiel de la formulation se fera sur la deuxième équation, mélangeant équation hyperbolique et terme elliptique.
+
+
+Nous établissons la formulation variationnelle. Après intégration par partie contre des fonctions test, nous obtenons le problème variationnel discret suivant :
+Nous cherchons $u_h,v_h \in \mathcal{P}^k(\mathcal{T}_h)$ tels que $\forall \phi,\omega \in \mathcal{P}^k(\mathcal{T}_h)$ :
+
+\begin{equation}
+    \sum_{j=1}^{N} \int_{T_j} \partial_t u_h \phi \ dx = \sum_{j=1}^{N} \int_{T_j} v \phi \ dx \label{formulation1}
+\end{equation}
+\begin{equation}
+    \sum_{j=1}^{N} \int_{T_j} \partial_t v_h \omega \ dx + a_h^{\text{sip}}(v,\omega) - \sum_{j=1}^{N} \int_{T_q} f(v_h) \partial_x \omega \ dx + \sum_{j=1}^{N} \Big( \widehat{f}_{j+\frac{1}{2}}\omega^{-}(x_{j + \frac{1}{2}}) - \widehat{f}_{j - \frac{1}{2}}\omega^+(x_{j - \frac{1}{2}}) \Big) = 0
+\end{equation}
+
+
+En introduisant la forme bilinéaire $a_h^{\text{sip}}$, dont la définition est ici donnée par : 
+$$a_h^{\text{sip}}(\psi, w) = \sum_{j=1}^{N} \int_{T_j} \partial_x \psi \partial_x w \ dx - \sum_{j=1}^{N} \Big( \{ \partial_x \psi \}_{j + \frac{1}{2}} \llbracket w \rrbracket_{j + \frac{1}{2}} + \{ \partial_x w \}_{j + \frac{1}{2}} + \llbracket w \rrbracket_{j+\frac{1}{2}}  \Big) + \sum_{j=1}^{N} \frac{\eta}{h_{j + \frac{1}{2}}} \llbracket \psi \rrbracket_{j+\frac{1}{2}} \llbracket w \rrbracket_{j + \frac{1}{2}} $$
+
+En prenant $\omega = \phi_q^{T_j}$ pour $q \in \llbracket 0,k \rrbracket$ et projetant $v_h$ sur la base de fonctions de forme locales $\phi_i$ : 
+\begin{equation*}
+\begin{split}
+    \sum_{j=1}^{N}\sum_{i=0}^{k} \bigg[ \int_{T_j} v_i^{T_j} \phi_i^{T_j} \phi_q^{T_j} \ dx &- \int_{T_j} f(v_h) \partial_x \phi_q^{T_j} \ dx  \\
+    & + \Big( \widehat{f}_{j+\frac{1}{2}}\phi_q^{T_j}(x_{j + \frac{1}{2}}) - \widehat{f}_{j - \frac{1}{2}} \phi_q^{T_j}(x_{j - \frac{1}{2}}) \Big) \bigg] - \sum_{i=0}^{k} v_i^{T_j}a_h^{\text{sip}} (\phi_i^{T_j} , \phi_q^{T_j} ) = 0
+\end{split}
+\end{equation*}
+On note $U$ le vecteur des coefficients modaux associé à $u_h$ ($U$ de taille $N\times k$ contient les coefficients qui permettent la reconstruction de la fonction $u_h$ sur chaque maille).
+Nous notons $u^{T_j}_i = U_{jk + i}$. 
+% Introduisons la "variable auxiliaire" $V = \frac{d}{dt}U$. On note $v_h \in \mathcal{P}^k(\mathcal{T}_h)$ la reconstruction à partir des coefficients modaux $V$. Nous retrouvons bien $\partial_t u_h = v_h$ :
+% \begin{equation*}
+% \begin{split}
+%     \partial_t u_h = \sum_{j=1}^{N}\sum_{i=0}^{k} \frac{d}{dt}u_i^{T_j}\phi_i^{T_j} &= \sum_{j=1}^{N}\sum_{i=0}^{k} \frac{d}{dt} U_{jk +i} \phi_i^{T_j} \\
+%     &= \sum_{j=1}^{N}\sum_{i=0}^{k} V_{jk+i}\phi_i^{T_j} = v_h
+% \end{split}
+% \end{equation*}
+% Penchons nous sur le terme issu de la discrétisation SIP de la partie elliptique, nous allons établir les matrices apparaissant dans la formulation :
+% \begin{equation*}
+% \begin{split}
+%     \sum_{j = 1}^{N} \int_{T_j} \partial_t u_h \partial_x \phi_q^{T_j} \ dx &= \sum_{j=1}^{N} \sum_{i=0}^{k} \int_{T_j} \frac{d}{dt}u_i^{T_j} \partial_x \phi_i^{T_j} \partial_x \phi_q^{T_j} \ dx \\
+%     & := \sum_{j=1}^{N} \sum_{i=0}^{k} \big(A_0^{T_j}\big)_{qi} \frac{d}{dt} u_i^{T_j} = \sum_{j=1}^{N} \sum_{i=0}^{k} \big(A_0^{T_j}\big)_{qi} v_i^{T_j}, \quad \forall q \in \llbracket 0,k \rrbracket \\
+% \end{split}
+% \end{equation*} 
+% \begin{equation*}
+% \begin{split}
+%     \sum_{j=1}^{N} &\bigg( \{ \partial_{tx} u_h \}_{j+\frac{1}{2}} \llbracket \phi_q^{T_j} \rrbracket_{j+\frac{1}{2}} + \{ \partial_x \phi_q \}_{j+\frac{1}{2}} \llbracket \partial_t u_h \rrbracket_{j+\frac{1}{2}} + \frac{\eta}{h_{j+\frac{1}{2}}} \llbracket \partial_t u_h \rrbracket_{j+\frac{1}{2}} \llbracket \phi_q \rrbracket_{j+\frac{1}{2}} \bigg) \\
+%     &= \sum_{j=1}^{N} \sum_{i=0}^{k} \bigg( \Big\{\frac{d}{dt} u_i \partial_x \phi_i \Big\}_{j+\frac{1}{2}} \llbracket \phi_q \rrbracket_{j + \frac{1}{2}} + \{ \partial_x \phi_q \}_{j+\frac{1}{2}} \Big\llbracket \frac{d}{dt} u_i \phi_i \Big\rrbracket_{j+\frac{1}{2}} + \frac{\eta}{h_{j+\frac{1}{2}}} \Big\llbracket \frac{d}{dt} u_i \phi_i \Big\rrbracket_{j+\frac{1}{2}} \llbracket \phi_q \rrbracket_{j+\frac{1}{2}} \bigg) \\
+%     % &= \sum_{j=1}^{N} \bigg( \{ v_h \}_{j+\frac{1}{2}} \llbracket \phi_q \rrbracket_{j + \frac{1}{2}} + \{ \partial_x \phi_q \}_{j+\frac{1}{2}} \llbracket u_h \rrbracket_{j+\frac{1}{2}} \frac{\eta}{h_{j+\frac{1}{2}}} \llbracket u_h \rrbracket_{j+\frac{1}{2}} \llbracket \phi_q \rrbracket_{j+\frac{1}{2}} \bigg) \\
+%     & := \sum_{j=1}^{N} S(V)^{T_j}_{q}, \quad \forall q \in \llbracket 0,k \rrbracket
+% \end{split}
+% \end{equation*}
+
+% \begin{equation*}
+% \begin{split}
+%     \sum_{j=1}^{N} \frac{\eta}{h_{j+\frac{1}{2}}} \llbracket \partial_t u_h \rrbracket_{j+\frac{1}{2}} \llbracket \phi_q \rrbracket_{j+\frac{1}{2}} &= \sum_{j=1}^{N} \sum_{i=0}^{k} \frac{d}{dt} u_i^{T_j} \llbracket \phi_i \rrbracket_{j+\frac{1}{2}} \llbracket \phi_q \rrbracket_{j+\frac{1}{2}} \\
+%     & :=  \sum_{j=1}^{N} \big( A_2 \big)_{qi}^{T_j} \frac{d}{dt}u_i^{T_j} \quad \forall q \in \llbracket 0,k \rrbracket
+% \end{split}
+% \end{equation*}
+Nous pouvons réutiliser le formalisme précédent de la formulation matricielle dG hyperbolique pour introduire les matrices de masse, de convection et les flux volumiques et aux interfaces.
+Nous réecrivons $a_h^{\text{sip}}$ sous la forme d'une matrice $K$ :
+$$K_{ik} = \sum_{j=1}^{N} a_h^{\text{sip}}(\phi_i^{T_j},\phi_p^{T_j}) $$
+La première équation (\ref{formulation1}) s'écrit, en prenant $\phi = \phi_k^{T_j}$ et en projetant dans l'espace polynomial dG :
+$$\sum_{j=1}^{N} \sum_{i=0}^{k} \int_{T_j} \frac{d}{dt} u_i^{T_j} \phi_i^{T_j} \phi_p^{T_j} \ dx = \sum_{j=1}^{N} \sum_{i=0}^{k} \int_{T_j} v_i^{T_j} \phi_i^{T_j} \phi_p^{T_j} \ dx \quad \forall p \in \llbracket 0,k \rrbracket $$
+
+Le système s'écrit, après projection de $u_h$ et $v_h$ sur la base des fonctions de forme locales, comme un sytème d'équations différentielles ordinaires couplé :
+$$\begin{cases}
+    M \frac{d}{dt} U = M V \\
+    MV + KV = \mathbb{F}(U)
+\end{cases}$$
+
+
+\begin{itemize}
+    \item $U$ et $V$ sont les vecteurs contenant les coefficients modaux dG de $u_h$ et $v_h$ sur chaque cellule.
+    \item $M$ est la matrice masse globale, diagonale par blocs
+    \item $K$ est la matrice de rigidité associée à $a_h^{\text{sip}}$, structure bloc creuse, issue du terme dispersion $\partial_{xx}u$
+    \item $\mathbb{F}(U)$ est le vecteur des flux advectifs non-linéaires, $\mathbb{F}(U) = C^{\mathsf{T}}F(U) - \widehat{F}(U)$
+\end{itemize}
+Si on écrit $\mathcal{A} = M + K$, la deuxième équation du système s'écrit $\mathcal{A}V = \mathbb{F}(U)$.
+\vspace{1em}
+
+Pour résoudre ce type de système, nous allons faire une décomposition LU de $\mathcal{A}$ et résoudre le système pour déterminer $V$. 
+Ensuite nous faisons l'évolution en temps $\frac{d}{dt}U = V$ à l'aide d'un intégrateur temporel, disons Euler explicite dans un premier temps :
+$$U^{n+1} = U^n + \Delta t V$$
+Lorsque le schéma aura été validé nous pourrons utiliser un schéma RK2 (méthode de Heun, ou schéma du point milieu), permettant une avance dans le temps d'ordre 2 plus stable.
+
+\vspace{1em}
+
+Concernant le traitement de la condition initiale, $u_0$ n'appartient pas nécessairement à l'espace d'approximation $\mathcal{P}^k(\Omega)$. 
+Il faudra ainsi projeter la condition $u_0$ dans l'espace dG. Pour cela pour allons procéder de la façon suivante :
+
+Nous cherchons à déterminer $u_h^0$ projection de la condition initiale $u_0$.
+Cette projection vérifie sur chaque maille $T \in \mathcal{T}_h$ et pour tout $j\in \llbracket 0,k \rrbracket$ :
+$$\int_{T} u_h^0 \phi_j^T \ dx = \int_{T} u_0 \phi_j^T \ dx$$
+En utilisant la décomposition de $u_h^0$ dans la base des fonctions de forme locales :
+$$\sum_{i=0}^{k} \int_{T} u_{h_i}^0 \phi_i^T \phi_j^T \ dx = \int_{T} u_0 \phi_j^T \ dx $$
+En reconnaissant la matrice de masse, nous obtenons un problème linéaire de la forme :
+$$M U_h^0 = B $$
+Où $B = \big(\int_{T} u_0 \phi_j ^T \ dx\big)_{0 \leq j\leq k} $.
+
+Ainsi pour projeter la condition initiale dans l'espace d'approximation nous allons devoir faire une projection $L^2$ puis résoudre un problème linéaire
+sur chaque maille qui, après assemblage global, founira un premier vecteur de coefficients dG pour les calculs.
+
+Une projection similaire est possible pour obtenir le vecteur flux volumique $F(U)$ dans la formulation hyperbolique :
+
+A partir de $U^n$ on reconstruit la solution numérique : 
+$$u_h(\cdot,t^n) = \sum_{j=1}^{N}\sum_{i=0}^{k} u_i^{T_j,n} \phi_i^{T_j} = \sum_{j=1}^{N}\sum_{i=0}^{k} U_{jk + i}^n \phi_i^{T_j}$$ 
+On injecte la solution reconstruite $u_h$ dans le flux physique $f$ puis on projette $f(u_h)$ de la même façon que la condition initiale, c'est en dire en faisant une 
+projection $L^2$ contre une fonction de base et en résolvant un problème linéaire avec la matrice de masse.
+
+
+\subsection{Formulation alternative : Problème mixte}
+
+Nous allons ici explorer une autre formulation possible, afin de montrer que les approches de résolution sont multiples, bien que dans la suite nous privilégierons la formulation précédemment établie sous forme de système d'EDO couplées.
+Ainsi, une autre manière de traiter cette équation se fait en faisant apparaître un problème mixte, hyperbolique d'un côté, elliptique de l'autre.
+
+
+\begin{equation*}
+\begin{split}
+    \partial_t u + \partial_x u + u\partial_x u - \partial_{txx}^3u &= 0 \\
+   \Leftrightarrow (1 - \partial_{xx}^2)\partial_t u + \partial_x \Big( u + \frac{1}{2}u^2 \Big) &= 0 
+\end{split}
+\end{equation*}
+
+L'opérateur $(1 - \partial_{xx}^2)$ est inversible, comme nous avons pu le voir au chapitre 3 lorsque nous mettions le problème sous forme intégrale.
+En effet, la transformée de Fourier (sur $L^2$) de l'opérateur donne :
+$$ \mathcal{F}\Big((1-\partial_{xx}^2)u\Big)(\xi) = (1 + \xi^2)\hat{u} $$
+Et l'inverse est donné par : $(1 - \partial_{xx}^2)^{-1}u = \mathcal{F}^{-1}\Big(\frac{\hat{u}}{1 + \xi^2}\Big) $
+
+\begin{equation*}
+\begin{split}
+    \Leftrightarrow \partial_t u + (1 - \partial_{xx}^2)^{-1}\partial_xf(u) &= 0 \\
+   \Leftrightarrow \partial_t u + \partial_x f(u) &= - (1 - \partial_{xx}^2)^{-1} \partial_x f(u) + \partial_x f(u) 
+\end{split}
+\end{equation*}
+En posant $Q(u) := (1 - \partial_{xx}^2)^{-1}\partial_x f(u) - \partial_x f(u)$, nous obtenons un système de la forme :
+
+$$\begin{cases}
+    \partial_t u + \partial_x f(u) = - Q(u) \\
+    Q(u) = (1 - \partial_{xx}^2)^{-1} \partial_x f(u) - \partial_x f(u)
+\end{cases}$$
+Ou encore :
+$$\begin{cases}
+    \partial_t u + \partial_x f(u) = - Q(u) \\
+    (1 - \partial_{xx}^2)Q(u) = \partial_xf(u) - (1 - \partial_{xx}^2) \partial_x f(u) = \partial_{xx}^2\partial_x f(u)
+\end{cases}$$
+Et en introduisant l'inconnue $q$, le problème devient : Trouver $u,q$ satisfaisant le problème suivant :
+\begin{equation}
+    \begin{cases}
+    \partial_t u + \partial_x f(u) = - q \\
+    (1 - \partial_{xx}^2)q = \partial_{xx}^2\partial_x f(u)
+\end{cases} \label{mixte}
+\end{equation}
+
+Nous pouvons montrer que cette formulation est bien équivalente à l'équation BBM initiale, nous injectons la seconde équation dans la première :
+\begin{equation*}
+\begin{split}
+    \partial_t u + \partial_x f(u) &= - (1 - \partial_{xx}^2)^{-1}\partial_{xx}^2\partial_x f(u) \\
+    \Leftrightarrow (1 - \partial_{xx}^2)\partial_t u + (1 - \partial_{xx}^2)\partial_x f(u) &= - \partial_{xx}^2\partial_x f(u) \\
+    \Leftrightarrow (1 - \partial_{xx}^2)\partial_t u + \partial_x f(u) - \partial_{xx}^2\partial_xf(u) &= - \partial_{xx}^2\partial_x f(u) \\
+    \Leftrightarrow \partial_t u + \partial_x f(u) - \partial_{txx}^3 u &= 0
+\end{split}
+\end{equation*}
+
+Nous pouvons étudier la résolution du système \ref{mixte} par une méthode dG hyperbolique pour la première équation telle que nous l'avons introduite en première partie du chapitre
+puis la seconde équation par une méthode IP-dG pour les équations elliptiques comme nous avons vu au début du chapitre également.
+Nous ne développerons pas cette formulation ici, nécessitant le traitement d'un terme d'ordre 3 sur le flux $f$.

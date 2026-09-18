@@ -1,0 +1,1013 @@
+\chapter{Propriétés mathématiques}
+
+\section{Existence et régularité}
+
+Dans cette section nous allons nous intéresser à la question de l'existence de solutions non-périodiques à l'équation, en suivant la méthode utilisée dans l'article de 1972 de Benjamin-Bona-Mahony \cite{BBM}.
+Nous allons montrer que le problème, posé sur un intervalle non borné, admet au moins une solution forte (i.e. une solution continûement
+différentiable qui vérifie en tout point $(x,t) \in \R \times [0,T] $ l'équation). 
+Nous commencerons par transformer l'équation originale en une forme intégrale, permettant de mettre en exergue les conditions 
+nécessaires à l'obtention de l'existence d'une solution, d'abord sur un intervalle de temps relativement restreint, puis sur un intervalle arbitrairement grand.
+Pour cela, nous allons introduire une série de lemmes qui nous permettront, à la fin de cette section, d'énoncer le théorème fondamental d'existence. Au fil de notre raisonnement,
+nous serons amenés à considérer différents espaces fonctionnels et formuler des hypothèses sur la condition initiale, notamment nous ferons le choix que cette dernière
+soit continue (et même dérivable et bornée) et asymptotiquement nulle.
+Le théorème permettra de garantir l'existence d'une solution sur un intervalle de temps aussi large que souhaité, sous condition
+que la donnée initiale $u_0$ soit d'énergie finie et possède suffisament de régularité. Autrement dit la condition initiale devrait appartenir à l'espace $H^1 \cap \mathcal{C}^2 $ afin qu'il y ait 
+existence d'une solution régulière au problème et qui soit asymptotiquement nulle.
+
+\vspace{1em}
+
+\subsection{Rappels de théorie des distributions et forme intégrale}
+
+Pour commencer nous allons opérer quelques transformations sur l'équation afin de la mettre sous forme intégrale. 
+Pour ces premières manipulations, afin de justifier convenablement, nous avons besoin de rappeler quelques outils de théorie des distributions et d'analyse des EDP.
+
+\vspace{1em}
+
+\begin{definitionbox}
+\begin{definition} 
+    Solution fondamentale (ou fonction de Green)
+
+    \vspace{1em}
+    
+    Soit $\mathfrak{D}$ un opérateur différentiel linéaire de la forme $\mathfrak{D} = \sum_{|\alpha| \leq m}^{} a_{\alpha}\partial^{\alpha}$.
+
+    Une solution fondamentale de l'opérateur $\mathfrak{D}$ est une distribution $E \in \mathcal{D}'(\R)$
+    qui est solution de l'équation 
+    $$ \mathfrak{D} E = \delta_0 $$
+
+\end{definition}
+\end{definitionbox}
+
+\begin{theorembox}
+\begin{theorem}
+    \textbf{Malgrange-Ehrenpreis}
+    \vspace{1em}
+
+    Tout opérateur différentiel linéaire à coefficients constants admet une solution fondamentale.
+
+
+\end{theorem}
+\end{theorembox}
+
+
+\begin{remarkbox}
+\begin{remark}
+    Lorsque l'opérateur n'est plus linéaire ou si les coefficients ne sont plus constants, le théorème n'est
+    plus vrai. On peut citer l'exemple de Lewy \footnote{Hans Lewy (1904 - 1988) mathématicien américain d'origine allemande} (1957) qui fournit une EDP à coefficients polynomiaux qui n'admet pas de solution au sens des distributions.
+\end{remark}
+\end{remarkbox}
+
+Ce théorème fondamental pour la théorie des équations aux dérivées partielles linéaires garantit que toute EDP linéaire à coefficients
+constants admet au moins une solution au sens des distributions.
+
+L'intérêt pratique des solutions fondamentales ici, réside dans la proposition suivante, 
+qui affirme qu'il suffit de prendre la convoluée avec le terme source pour obtenir une solution de l'équation non homogène.
+
+\begin{definitionbox}
+\begin{definition}
+    Soit $\Omega$ un ouvert de $\R^d$.
+    
+    Nous définissons $\mathcal{E}'(\Omega)$ comme étant l'espace des distributions à support compact, où nous utilisons la définition suivante pour le support d'une distribution $T \in \mathcal{D}'(\Omega)$ :
+    $$\text{Supp}(T) = \Bigl\{ x \in \Omega | \; \exists \omega_x \subset \Omega \ \ \text{ouvert}  \ \text{tel que} \ \ T_{|\omega_x} = 0 \ \text{dans} \ \mathcal{D}'(\omega_x) \Bigr\}^{c}$$
+
+    Avec 
+    $$\forall \varphi \in \mathcal{D}(\omega_x), \ \big<T_{|\omega_x},\varphi\big>_{\mathcal{D}'(\omega_x),\mathcal{D}(\omega_x)} = \big<T,\tilde{\varphi} \big>_{\mathcal{D}'(\Omega),\mathcal{D}(\Omega)}$$ 
+    Où $\tilde{\varphi}$ est le prolongement de $\varphi$ sur $\Omega$ par 0.
+    
+\end{definition}
+\end{definitionbox}
+
+\begin{propositionbox}
+\begin{proposition}
+    Si $E \in \mathcal{D}'(\Omega)$ est une solution élémentaire d'un opérateur différentiel linéaire $\mathfrak{D}$,
+    alors $\forall f \in \mathcal{E}'(\Omega)$, $E \star f$ est solution de l'équation avec second membre
+    $$ \mathfrak{D}u = f $$
+\end{proposition}
+\end{propositionbox}
+
+\begin{proof}
+    C'est une conséquence des propriétés de dérivation sur les convolutions :
+    
+    \vspace{1em}
+    Soit $E \in \mathcal{D}'(\Omega)$ solution fondamentale de $\mathfrak{D}$ et $f \in \mathcal{E}'(\Omega)$
+    
+    \begin{equation*}
+    \begin{split}
+        \mathfrak{D}\bigl( E \star f \bigr) = E \star \mathfrak{D}(f) &= \mathfrak{D}(E) \star f \\
+        &= \delta_0 \star f = f
+    \end{split}
+    \end{equation*}
+\end{proof}
+\begin{lemmabox}
+\begin{lemma}
+    La solution fondamentale $E$ de l'opérateur $\bigl( 1 - \frac{d^2}{dx^2}\bigr) $ est donnée par
+    $$E(x) = \frac{1}{2}e^{-|x|} $$
+\end{lemma}
+\end{lemmabox}
+
+\begin{proof}
+    Soit $u \in \mathcal{S}'(\R)$,
+    Puisque la transformée de Fourier est un isomorphisme continu sur $\mathcal{S}'(\R)$, 
+    \begin{equation*}
+    \begin{split}
+        u - \frac{d^2}{dx^2}u &= \delta_0 \\
+        \Leftrightarrow \mathcal{F}(u) - \mathcal{F}\Bigl(\frac{d^2}{dx^2}u\Bigr) &= \mathcal{F}(\delta_0) = 1 \\
+        \Leftrightarrow \hat{u} + \xi^2 \hat{u} &= 1 \\
+        \Leftrightarrow \hat{u}(\xi) &= \frac{1}{1 + \xi^2}
+    \end{split}
+    \end{equation*}
+    En se rappelant de l'expression de la transformée de Fourier de la fonction de Laplace,
+    $$ \mathcal{F}\bigl(e^{-|x|}\bigr)(\xi) = \frac{2}{1 + \xi ^2} $$
+    On peut conclure que, 
+    \begin{equation*}
+    \begin{split}
+        \hat{u} &= \frac{1}{2} \mathcal{F}\bigl( e^{-|x|} \bigr)\\
+        \Leftrightarrow u(x) &= \frac{1}{2}e^{-|x|}
+    \end{split}
+    \end{equation*}
+\end{proof}
+
+Nous allons maintenant appliquer nos transformations à l'équation BBM. On part de l'équation,
+\begin{equation}
+    \partial_t u + \partial_x u + u\partial_x u - \partial_{txx}^3 u = 0 \label{BBM}
+\end{equation}
+
+Nous pouvons rassembler les termes sous forme de "flux" et obtenir cette forme :
+
+$$ \bigl(1 - \partial_{xx}^2\bigr) \partial_t u = -\partial_x \Bigl( u + \frac{u^2}{2} \Bigr) $$
+
+Que nous pouvons voir comme une équation différentielle ordinaire en $\partial_t u$
+
+En appliquant les résultats du lemme et la proposition précédente, en conservant les notations précédentes
+on a :
+
+\begin{equation*}
+\begin{split}
+    \partial_t u &= E \star \Bigl(-\partial_x \Bigl( u + \frac{1}{2}u^2 \Bigr) \Bigr) \\
+    &= - \int_{-\infty}^{+\infty} E(x-\xi) \partial_\xi \Bigl( u(\xi,t) + \frac{1}{2}u^2(\xi,t) \Bigr) d\xi \\
+    &= - \frac{1}{2} \int_{-\infty}^{+\infty} e^{-|x - \xi|}\partial_\xi \Bigl( u(\xi,t) + \frac{1}{2}u^2(\xi,t) \Bigr) d\xi
+\end{split}
+\end{equation*}
+
+Après intégration par partie, en ayant supposé que $u$ est bornée, nous obtenons : 
+
+\begin{equation*}
+\begin{split}
+    \partial_t u &= \frac{1}{2} \int_{-\infty}^{+\infty} \sigma(x - \xi) e^{-|x - \xi|} \Bigl( u(\xi,t) + \frac{1}{2}u^2(\xi,t) \Bigr) d\xi - \biggl[ \frac{1}{2} e^{-|x - \xi|} \Bigl(u(\xi,t) + \frac{1}{2}u^2(\xi,t)\Bigr) \biggr]_{\xi \rightarrow -\infty} ^{\xi \rightarrow +\infty} \\
+    &= \frac{1}{2} \int_{-\infty}^{+\infty} \sigma(x - \xi) e^{-|x - \xi|} \Bigl( u(\xi,t) + \frac{1}{2}u^2(\xi,t) \Bigr) d\xi \\
+    &= \int_{-\infty}^{+\infty} K(x-\xi) \Bigl( u(\xi,t) + \frac{1}{2}u^2(\xi,t) \Bigr) d\xi
+\end{split}
+\end{equation*}
+
+Où $K(x) = \frac{1}{2} \sigma(x)e^{-|x|}$ et $\sigma(x) = 
+\begin{cases}
+    1 &\text{ si } x\geq0 \\
+    -1 &\text{ si } x<0
+\end{cases}$
+
+\vspace{1em}
+
+Et finalement, par théorème fondamental de l'analyse : 
+\begin{equation}
+    u(x,t) = u(x,0) + \int_{0}^{t} \int_{-\infty}^{+\infty} K(x-\xi) \Bigl( u(\xi,\tau) + \frac{1}{2}u^2(\xi,\tau) \Bigr) d\xi d\tau \label{integrale}
+\end{equation}
+
+\vspace{1em}
+
+On réecrit donc l'équation sous la forme $u = Au = u_0 + Bu$, en ayant posé $u_0 := u(\cdot,0)$.
+
+\vspace{1em}
+
+\subsection{Existence sur un intervalle de temps restreint}
+
+Désormais nous allons chercher des restrictions sur $u_0$ afin de garantir l'existence d'une solution à la fois de \ref{BBM} et \ref{integrale}.
+L'équation \ref{integrale} que nous venons d'obtenir va servir de point de départ pour appliquer un théorème de point fixe.
+La suite consiste ici à trouver les conditions sous lesquelles l'opérateur $A$ satisfait les hypothèses d'un
+théorème de point fixe.
+
+Le théorème sera le suivant :
+
+\begin{theorembox}
+\begin{theorem}
+    \textbf{Point fixe de Banach-Picard.}
+
+    Soit $(E,\|\cdot\|)$ un espace de Banach et $T:E \longrightarrow E$ une application contractante, c'est à dire vérifiant :
+    $$\exists \text{ } k \in ]0,1[, \text{ } \forall (x,y) \in E, \text{ } \|T(x) - T(y)\| \leq k \|x - y\|$$
+
+    Alors, il existe un unique $\tilde{x} \in E$ tel que $T(\tilde{x}) = \tilde{x}$.
+
+
+\end{theorem}
+\end{theorembox}
+
+\begin{proof}
+    On construit une suite reccurrente de la forme $u_{n+1} = T(u_n)$ et on montre que cette suite converge vers un point fixe.
+
+\end{proof}
+
+\vspace{1em}
+
+On définit l'espace de Banach $\mathcal{C}_T$ comme étant l'espace des fonctions continues et uniformément bornées sur $\R \times [0,T]$,
+muni de la norme $\|v\|_{\mathcal{C}} = \underset{x \in \R, t \in [0,T]}{\sup}|v(x,t)|$.
+De même, nous définissons $\mathcal{C}_T ^{l,m}$, l'espace des fonctions $v \in \mathcal{C}_T$ $m$ fois dérivables suivant $x$ et $l$ fois dérivables suivant $t$ et vérifiant :
+$$\partial_x^i \partial_t ^j v \in \mathcal{C}_T \text{, } 0 \leq i \leq l \text{, } 0 \leq j \leq m$$
+
+\begin{lemmabox}
+\begin{lemma} \label{lemme 1}
+    Si $u_0:\R \longrightarrow \R$ est continue telle que $\sup_{x \in R}|u_0(x)| \leq b < + \infty$,
+    alors il existe $t_0(b) > 0$ tel que le problème \ref{integrale} admet une solution continue et bornée pour $(x,t) \in \R \times [0,t_0]$
+\end{lemma}
+\end{lemmabox}
+
+\begin{proof}
+    On se place dans l'espace de Banach $\mathcal{C}_{t_0}$. 
+    
+    Pour $u_1,u_1 \in \mathcal{C}_{t_0}$, et $(x,t) \in \R \times [0,t_0]$,
+
+    \begin{equation*}
+    \begin{split}
+        |Au_1(x,t) - Au_2(x,t)| &= |Bu_1(x,t) - Bu_2(x,t)| \\ 
+        &\leq \int_{0}^{t} \int_{-\infty}^{+\infty} \Big| K(x-\xi) \Bigl( u_1(\xi,\tau) - u_2(\xi,\tau)+ \frac{1}{2}u_1^2(\xi,\tau) - \frac{1}{2}u_2^2(\xi,\tau) \Bigr) \Big| d\xi d\tau \\
+        &\leq \int_{0}^{t} \int_{-\infty}^{+\infty} \big| K(x-\xi) \big| \Biggl( \Big| u_1(\xi,\tau) - u_2(\xi,\tau) \Big| + \frac{1}{2}\Big| u_1^2(\xi,\tau) - u_2^2(\xi,\tau) \Big| \Biggr)d\xi d\tau \\
+        &\leq \|u_1 - u_2\|_{\mathcal{C}_{t_0}} \int_{0}^{t} \int_{-\infty}^{+\infty} \big| K(x-\xi) \big| \Bigl( 1 + \frac{1}{2} | u_1(\xi,\tau) + u_2(\xi,\tau) | \Bigr) d\xi d\tau \\
+        &\leq \|u_1 - u_2\|_{\mathcal{C}_{t_0}} \Bigl( 1 + \frac{1}{2} \| u_1 + u_2 \|_{\mathcal{C}_{t_0}} \Bigr) \int_{0}^{t} \int_{-\infty}^{+\infty} \big| K(x-\xi) \big| d\xi d\tau \\
+        &\leq \|u_1 - u_2\|_{\mathcal{C}_{t_0}} \Bigl( 1 + \frac{1}{2} \| u_1\|+ \frac{1}{2} \|u_2 \|_{\mathcal{C}_{t_0}} \Bigr) \|K\|_{L^1} t
+    \end{split}
+    \end{equation*}
+
+    Mais on a : 
+    \begin{equation*}
+    \begin{split}
+        \|K\|_{L^1} &= \int_{-\infty}^{+\infty} \big| K(y) \big| dy \\
+        &= \int_{-\infty}^{+\infty} \frac{1}{2} \big| \sigma(y)e^{-|y|} \big| dy = \int_{0}^{+\infty} e^{-y} dy = 1
+    \end{split}
+    \end{equation*}
+
+    Donc, 
+
+    $$|Au_1(x,t) - Au_2(x,t)| \leq \|u_1 - u_2\|_{\mathcal{C}_{t_0}} \Bigl( 1 + \frac{1}{2} \| u_1\|_{\mathcal{C}_{t_0}}+ \frac{1}{2} \|u_2 \|_{\mathcal{C}_{t_0}} \Bigr) t$$
+    
+    \vspace{1em}
+
+    Et par conséquent en passant à la borne supérieure, 
+
+    $$\|Au_1 - Au_2\|_{\mathcal{C}_{t_0}} \leq \|u_1 - u_2\|_{\mathcal{C}_{t_0}} \Bigl( 1 + \frac{1}{2} \| u_1\|_{\mathcal{C}_{t_0}}+ \frac{1}{2} \|u_2 \|_{\mathcal{C}_{t_0}} \Bigr) t_0$$
+
+    Cela montre déjà la continuité de l'opérateur $A$. Maintenant, en supposant que $u_1$ et $u_2$ sont bornées,
+    c'est à dire qu'il existe $R > 0$ tel que $\|u_1\|_{\mathcal{C}_{t_0}},\|u_2\|_{\mathcal{C}_{t_0}} \leq R$, on va montrer qu'il existe une constante de contraction pour $A$. 
+    
+    L'inégalité devient :
+    $$\|Au_1 - Au_2\|_{\mathcal{C}_{t_0}} \leq \|u_1 - u_2\|_{\mathcal{C}_{t_0}} \Bigl( 1 + \frac{1}{2} R+ \frac{1}{2} R \Bigr) t_0 = ( 1 + R) t_0 \|u_1 - u_2\|_{\mathcal{C}_{t_0}}$$
+
+    
+    En choisissant $t_0$ de sorte que $t_0 (1 + R) := \theta < 1$, alors on obtient finalement une inégalité de contraction pour $A$ :
+
+    $$\|Au_1 - Au_2\|_{\mathcal{C}_{t_0}} \leq \theta \|u_1 - u_2\|_{\mathcal{C}_{t_0}}$$
+
+    L'inégalité étant la même pour l'opérateur $B$, en prenant $u_2 = 0$ nous obtenons : 
+
+    $$\|Bu\|_{\mathcal{C}_{t_0}} \leq \theta \|u\|_{\mathcal{C}_{t_0}}$$
+
+    \vspace{1em}
+    Et donc en vérifiant que l'opérateur $A$ envoie $B_{\mathcal{C}_{t_0}}(0,R)$ dans elle même, 
+
+    \begin{equation*}
+    \begin{split}
+        \|Au\|_{\mathcal{C}_{t_0}} &\leq \underset{x \in \R}{\sup} |u_0 (x)| + \|Bu\|_{\mathcal{C}_{t_0}} \\
+        &\leq b + \theta\|u\|_{\mathcal{C}_{t_0}} \\
+        &\leq b + \theta R \leq R
+    \end{split}
+    \end{equation*}
+
+
+    Nous obtenons la condition suivante,
+    \begin{equation*}
+    \begin{split}
+        b + \theta R &\leq R \\
+        \Leftrightarrow b &\leq (1 - \theta)R
+    \end{split}
+    \end{equation*}
+
+    Sous ces conditions nous avons existence d'un unique point fixe par le théorème de Banach-Picard.
+    Le problème \ref{integrale} admet donc une solution dans $\mathcal{C}_{t_0}$.
+
+\end{proof}
+
+
+\subsection{Conditions de régularité et solution forte}
+
+\begin{lemmabox}
+\begin{lemma} \label{lemme 2}
+    Si $u_0 \in \mathcal{C}^2$, alors toute solution $u(x,t)$ de \ref{integrale} qui est également dans $\mathcal{C}_{T}$ (pour un $T>0$ arbitraire) est 
+    dans $\mathcal{C}_T ^{2,\infty}$ et est une solution forte du problème \ref{BBM}.
+\end{lemma}
+\end{lemmabox}
+
+\begin{proof}
+    
+    Pour démontrer la régularité en temps, nous allons d'abord appliquer le théorème de dérivation sous le signe 
+    intégrale en utilisant le fait que $u$ est bornée, puis nous allons étendre cette propriété pour tout ordre de dérivation par réccurence.
+
+    \vspace{1em}
+    Par nos investigations précédentes, nous avons montré que 
+
+    $$\partial_t u = \int_{-\infty}^{+\infty} K(x-\xi) \Bigl( u(\xi,t) + \frac{1}{2}u^2(\xi,t) \Bigr) d\xi$$
+
+    Puisque $u \in \mathcal{C}_T$, alors,
+
+    $$ \Big| K(x-\xi) \Bigl( u(\xi,t) + \frac{1}{2}u^2(\xi,t) \Bigr) \Big| \leq \Bigl( \|u\|_{\mathcal{C}_T} + \frac{1}{2}\|u^2\|_{\mathcal{C}_T} \Bigr) \big| K(x-\xi) \big|$$
+
+    Avec $K \in L^1(\R)$
+
+    De cette majoration nous déduisons deux choses. Premièrement, puisque $u$ est continue, alors par théorème de continuité
+    nous avons la continuité de $\partial_t u$. Deuxièmement, par dérivabilité de $u$ suivant $t$, puisque $\partial_t u$ est continue et bornée, 
+
+    $$\Big| K(x - \xi) \partial_t \Bigl( u(\xi,t) + \frac{1}{2} u^2(\xi,t) \Bigr)\Big| \leq \big| K(x -\xi) \big| \Bigl( \|\partial_t u\|_{\mathcal{C}_T} + \frac{1}{2}\|\partial_t u^2\|_{\mathcal{C}_T} \Bigr) $$
+    
+    On a une majoration uniforme en $t$, en appliquant le théorème de 
+    dérivation, $t \mapsto u(x,t)$ est $\mathcal{C}^2$ et nous avons l'expression suivante :
+
+    $$\partial_t^2 u = \int_{-\infty}^{+\infty} K(x-\xi) \partial_t\Bigl( u(\xi,t) + \frac{1}{2}u^2(\xi,t) \Bigr) d\xi$$
+
+    Il est facile à partir d'ici de généraliser pour un ordre $m$ quelconque en utilisant la régularité de la dérivée à l'ordre précédent : 
+
+    $$\partial_t^m u = \int_{-\infty}^{+\infty} K(x-\xi) \partial_t^{m-1}\Bigl( u(\xi,t) + \frac{1}{2}u^2(\xi,t) \Bigr) d\xi$$
+
+    Par réccurence immédiate sur $m\geq 1$, nous obtenons la régularité annoncée pour $t$.
+
+
+    En ce qui concerne la dérivation suivant $x$, nous allons procéder de façon similaire en appliquant le théorème de dérivation.
+
+
+    \underline{Pour $x > \xi$ :} 
+    $$K(x-\xi) = \frac{1}{2}e^{-(x - \xi)}$$
+    $$K'(x-\xi) = -\frac{1}{2}e^{-(x - \xi)}$$
+
+    \underline{Pour $x < \xi$ :} 
+    $$K(x-\xi) = -\frac{1}{2}e^{(x - \xi)}$$
+    $$K'(x-\xi) = -\frac{1}{2}e^{(x - \xi)}$$
+
+    En séparant l'intégrale et en notant $U(x,t) = u(x,t) + \frac{1}{2} u^2(x,t)$ on obtient :
+
+    $$u(x,t) = u_0(x) + \int_{0}^{t} \Biggl( \int_{-\infty}^{x} \frac{1}{2} e^{-(x - \xi)} U(\xi,\tau) d\xi - \int_{x}^{+\infty} \frac{1}{2} e^{(x - \xi)} U(\xi,\tau) d\xi \Biggr) d\tau$$
+
+    Puis en appliquant le théorème de dérivation sous le signe intégrale (pour $t$ dans un premier temps) puis en dérivant en appliquant le théorème de Leibniz,
+
+    
+    \begin{equation*}
+    \begin{split}
+        \partial_x u &= u_0'(x) + \int_{0}^{t} \partial_x \Biggl( \int_{-\infty}^{x} \frac{1}{2} e^{-(x - \xi)} U(\xi,\tau) d\xi - \int_{x}^{+\infty} \frac{1}{2} e^{(x - \xi)} U(\xi,\tau) d\xi \Biggr) d\tau \\
+        &= u_0'(x) +  \int_{0}^{t} \Biggl(U(x,\tau) - \int_{-\infty}^{x} \frac{1}{2} e^{-(x - \xi)} U(\xi,\tau) d\xi - \int_{x}^{+\infty} \frac{1}{2} e^{(x - \xi)} U(\xi,\tau) d\xi \Biggr) d\tau\\
+        &= u_0'(x) + \int_{0}^{t} u(x,\tau) + \frac{1}{2} u^2(x,\tau) d\tau  - \int_{0}^{t} \int_{-\infty}^{+\infty} \frac{1}{2} e^{-|x - \xi|} \Bigl( u(\xi,\tau) + \frac{1}{2}u^2(\xi,\tau) \Bigr) d\xi d\tau \\
+    \end{split}
+    \end{equation*}
+
+    On montre que $\partial_{xx}^2 u$ existe en utilisant le fait que $u$ est bornée, $[0,t]$ est un intervalle de mesure finie. On obtient au final :
+
+    \begin{equation*}
+    \begin{split}
+        \partial_{xx}^2 u &= u_0''(x) + \int_{0}^{t} \partial_x \Bigl( u(x,\tau) + \frac{1}{2} u^2(x,\tau) \Bigr) d\tau  + \int_{0}^{t} \int_{-\infty}^{+\infty} \frac{1}{2} \sigma(x-\xi) e^{-|x - \xi|} \Bigl( u(\xi,\tau) + \frac{1}{2}u^2(\xi,\tau) \Bigr) d\xi d\tau \\
+        &= u_0''(x) + \int_{0}^{t} \partial_x \Bigl( u(x,\tau) + \frac{1}{2} u^2(x,\tau) \Bigr) d\tau + \int_{0}^{t} \int_{-\infty}^{+\infty} K(x - \xi) \Bigl( u(\xi,\tau) + \frac{1}{2}u^2(\xi,\tau) \Bigr) d\xi d\tau \\
+        &= u_0''(x) + \int_{0}^{t} \partial_x \Bigl( u(x,\tau) + \frac{1}{2} u^2(x,\tau) \Bigr) d\tau + u(x,t) - u_0(x)
+    \end{split}
+    \end{equation*}
+
+    
+    On a donc montré que sous ces conditions si $u$ est solution de \ref{integrale}, alors $u \in \mathcal{C}_T^{2,\infty}$
+    Il ne reste plus qu'à montrer que $u$ satisfait \ref{BBM} : 
+
+    \begin{equation*}
+    \begin{split}
+        \partial_t u + \partial_x u + u\partial_x u - \partial_{txx}^3u &= \partial_t u + \partial_x \Bigl(u + \frac{1}{2}u^2\Bigr) - \partial_{txx}^3u \\ 
+        &=\partial_t u + \partial_x \Bigl( u + \frac{1}{2}u^2 \Bigr) - \partial_x \Bigl( u + \frac{1}{2}u^2 \Bigr) - \partial_t u \\
+        &= 0
+    \end{split}
+    \end{equation*}
+
+    Donc $u$ est solution forte de l'equation \ref{BBM}.
+
+\end{proof}
+
+
+\begin{remarkbox}
+\begin{remark}
+    On peut remarquer que la régularité en espace de la solution est directement dûe à celle 
+    de la condition initiale $u_0$, en particulier si $u_0 \in \mathcal{C}^l$, $l \geq 3$ alors on peut prolonger la démonstration précédente : 
+
+    Puisque $u \in \mathcal{C}_T^{2,\infty}$, alors $\big| \partial_{xx} ^2 \Bigl(u(x,\tau) + \frac{1}{2}u^2(x,\tau)\Bigr) \big| \leq \|\partial_{xx}^2 u\|_{\mathcal{C}_T} + \frac{1}{2}\|\partial_{xx}^2 u^2\|_{\mathcal{C}_T}$ et l'intervalle
+    $[0,T]$ étant de mesure finie, par théorème de dérivation,
+
+    $$ \partial_{xxx}^3 u = u_0^{(3)}(x) + \int_{0}^{t} \partial_{xx}^2 \Bigl( u(x,\tau) + \frac{1}{2} u^2(x,\tau) \Bigr) d\tau + \partial_x u(x,t) - u_0'(x) $$
+
+    Et puis en généralisant pour $j \in \{3, \dots , l\}$,
+
+    $$ \partial_{x}^j u = u_0^{(j)}(x) + \int_{0}^{t} \partial_{x}^{(j-1)} \Bigl( u(x,\tau) + \frac{1}{2} u^2(x,\tau) \Bigr) d\tau + \partial_x^{(j-2)} u(x,t) - u_0^{(j-2)}(x) $$
+
+\end{remark}
+\end{remarkbox}
+
+\vspace{1em}
+
+Pour la suite du raisonnement, nous allons supposer que la condition initiale $u_0$ est continue et asymptotiquement nulle, 
+c'est à dire $\lim_{x \rightarrow \pm \infty} u_0(x) = 0$
+
+\begin{lemmabox}
+\begin{lemma} \label{lemme 3}
+    Si $u(x,t)$ est solution du problème intégral \ref{integrale} et $u_0^{(j)}$ est continue et asymptotiquement nulle pour $0 \leq j\leq p$, 
+    alors $\partial_x^{j}\partial_t^m u$ est asymptotiquement nulle pour $m \geq 0$ et $0 \leq j\leq p$
+\end{lemma}
+\end{lemmabox}
+
+\begin{proof}
+
+    Premièrement, montrons que $u$ est asymptotiquement nulle.
+
+    Dans le lemme \ref{lemme 1} nous avons utilisé le théorème de point fixe de Banach Picard pour démontrer l'existence d'une solution.
+    Ce point fixe est donné par la limite de la suite $v_{n+1} = Av_n$, $v_0 = u_0$. Ainsi, $(v_n)_n$ est une suite de fonctions 
+    asymptotiquement nulles par continuité de l'opérateur $A$. 
+    On peut aisément montrer que $u$ est asymptotiquement nulle :
+
+    \begin{equation*}
+    \begin{split}
+        |u(x)| &= |u(x) - u_n(x) + u_n(x) | \\
+        &\leq  |u(x) - u_n(x) | + |u_n(x)| \\
+        &\leq \|u - u_n\|_{\mathcal{C}} + |u_n(x)|
+    \end{split}
+    \end{equation*}
+
+    Lorsque $n \longrightarrow +\infty$ et $|x| \longrightarrow +\infty$, puisque $u_n \overunderset{\mathcal{C}}{n \rightarrow +\infty}{\longrightarrow} u$  et $|u_n(x) | \underset{x \rightarrow \pm \infty}{\longrightarrow} 0$,
+    on a $|u(x)| \underset{x \rightarrow \pm \infty}{\longrightarrow} 0$.
+
+    Donc $u$ est asymptotiquement nulle. 
+
+    Il suffit maintenant de vérifier que les termes 
+    $$\int_{-\infty}^{+\infty} K(x - \xi) \Bigl( u(\xi,\tau) + \frac{1}{2}u^2(\xi,\tau) \Bigr) d\xi \text{ et } \int_{-\infty}^{+\infty} \frac{1}{2} e^{-|x - \xi|} \Bigl( u(\xi,\tau) + \frac{1}{2}u^2(\xi,\tau) \Bigr) d\xi$$
+    
+    sont asymptotiquement nuls. 
+
+    Pour cela il va suffire de montrer que le second terme vérifie bien ce que l'on souhaite.
+    
+    Soit $v \in L^1(\R)$ continue et asymptotiquement nulle. Soit $\xi_0 \in \R$ tel que $\xi_0 \leq x$.
+
+    \begin{equation*}
+    \begin{split}
+        \Big| \int_{-\infty}^{+\infty} e^{-|x - \xi|}v(\xi)d\xi \Big| &\leq \int_{-\infty}^{\xi_0} e^{-(x-\xi)}|v(\xi)|d\xi + \int_{\xi_0}^{+\infty} e^{x-\xi}|v(\xi)|d\xi \\
+        &= e^{-x}\int_{-\infty}^{\xi_0} e^{\xi}|v(\xi)|d\xi + \int_{\xi_0}^{+\infty} e^{x-\xi}|v(\xi)|d\xi \\
+        &\leq e^{-x}\int_{-\infty}^{\xi_0} e^{\xi}|v(\xi)|d\xi + \underset{\xi\geq \xi_0}{\sup} |v(\xi)| \int_{\xi_0}^{+\infty} e^{x - \xi} d\xi \\
+        &\leq e^{-x}\int_{-\infty}^{\xi_0} e^{\xi}|v(\xi)|d\xi + \underset{\xi\geq \xi_0}{\sup} |v(\xi)| e^{x - \xi_0} \\
+        &\leq e^{-x}\int_{-\infty}^{\xi_0} e^{\xi}|v(\xi)|d\xi + \underset{\xi\geq \xi_0}{\sup} |v(\xi)|
+    \end{split}
+    \end{equation*}
+
+    En choisissant $\xi_0$ arbitrairement grand, on montre que lorsque $|x| \longrightarrow +\infty$ le terme tend bien vers $0$.
+    Puisque $K(x) = \frac{1}{2}\sigma(x)e^{-|x|}$, le résultat est vrai pour les deux termes. 
+
+    Il est donc clair dans ces conditions que $\partial_x u$ et $\partial_t u$ sont asymptotiquement nulles, puis $\partial_{xx}^2 u$ également.
+    Et comme conséquence directe, $\partial_x ^{j}u$ l'est aussi.
+    Ensuite on étend le résultat pour $m = 1$ et $3 \leq j \leq p$,
+
+    \begin{equation*}
+    \begin{split}
+        \partial_t \partial_x^j u &= \partial_t \int_{0}^{t} \partial_{x}^{(j-1)} \Bigl( u(x,\tau) + \frac{1}{2} u^2(x,\tau) \Bigr) d\tau + \partial _t\partial_x^{(j-2)} u(x,t) \\
+        &= \partial_{x}^{(j-1)} \Bigl( u(x,t) + \frac{1}{2} u^2(x,t) \Bigr) + \partial _t\partial_x^{(j-2)} u(x,t)
+    \end{split}
+    \end{equation*}
+
+    Puis par réccurence pour $m \geq 1$ on obtient ce que l'on souhaitait démontrer.
+
+\end{proof}
+
+
+\vspace{1em}
+
+\subsection{Existence et régularité en temps long}
+
+Nous allons maintenant aborder le point essentiel de cette section : l'existence d'une solution régulière au problème initial \ref{BBM} pour tout temps $t \geq 0$.
+Ce sera le propos du théorème que nous allons introduire dans la suite immédiate de notre raisonnement.
+
+Plaçons nous dans les hypothèses du lemme \ref{lemme 2} : on suppose $u_0 \in \mathcal{C}^2$ et $u$ est solution de la forme intégrale \ref{integrale}.
+Dans ce cas nous avons $u \in \mathcal{C}_T^{2,\infty}$ et est solution de l'equation initiale \ref{BBM}.
+
+En reprenant l'equation originale \ref{BBM}, en la multipliant par $u$ puis en intégrant sur un volume contrôle $[-R,R]$ on obtient :
+
+$$\Bigl( \partial_t u + \partial_x u + u\partial_xu - \partial_{xxt}^3u \Bigr)u = 0$$
+
+\begin{equation*}
+\begin{split}
+    \int_{-R}^{R} \Bigl( \partial_t u + \partial_x u + u\partial_xu - \partial_{xxt}^3u \Bigr)u \text{ } dx &= \int_{-R}^{R} u\partial_t u + \partial_x\Bigl( \frac{1}{2}u^2 + \frac{1}{3}u^3 \Bigr) - u\partial_{xxt}^3u \text{ } dx \\
+    &= \int_{-R}^{R} u\partial_t u + \partial_xu\partial_{xt}^2u dx + \Big[ \frac{1}{2}u^2 + \frac{1}{3}u^3 - u\partial_{xt}^2 u \Big]_{-R}^{R} = 0
+\end{split}
+\end{equation*}
+
+
+
+Nous avons montré dans le lemme \ref{lemme 3} qu'en choisissant une condition initale $u_0$ continue et asymptotiquement nulle, $u$ et ses dérivées sont asymptotiquement nulles.
+
+Le second terme étant continu (par \ref{lemme 2}) et asymptotiquement nul, pour $t \in [0,T]$, nous pouvons intégrer suivant $t$ et appliquer le théorème de Fubini (le premier terme étant dans $L^1(\R\times[0,t])$)
+
+\begin{equation*}
+\begin{split}
+    \int_{0}^{t} \int_{-R}^{R} u\partial_\tau u + \partial_xu\partial_{x\tau}^2u \text{ } dx d\tau &= \int_{-R}^{R} \int_{0}^{t} \partial_\tau \big( u^2 + (\partial_x u)^2\big) \text{ } d\tau dx \\
+    &= \int_{-R}^{R} u^2 + (\partial_x u)^2 - u_0^2 - (u_0')^2 \text{ } dx  \\
+    &= \int_{-R}^{R} u^2 + (\partial_x u)^2 \text{ } dx - \int_{-R}^{R} u_0^2 + (u_0')^2 \text{ } dx \\
+    &= - \int_{0}^{t} \Big[ \frac{1}{2}u^2 + \frac{1}{3}u^3 - u\partial_{x\tau}^2 u \Big]_{-R}^{R} d\tau
+\end{split}
+\end{equation*}
+
+En supposant que l'intégrale $\int_{-R}^{R} u_0^2 + (u_0')^2 dx$ reste bornée lorsque $R \longrightarrow +\infty$, puisque le terme de droite est asymptotiquement nul (et vérifie les hypothèses du théorème de convergence dominée), alors nécéssairement 
+le terme $\int_{-R}^{R} u^2 + (\partial_x u)^2 dx$ reste borné lorsque $R \longrightarrow +\infty$. 
+A la limite nous obtenons :
+
+$$\int_{-\infty}^{+\infty} u^2 + (\partial_x u)^2 dx = \int_{-\infty}^{+\infty} u_0^2 + (u_0')^2 \text{ } dx \text{, } \forall t \in [0,T]$$
+
+
+La condition $u_0$ asymptotiquement nulle peut être remplacée par la condition 
+$$\int_{-\infty}^{+\infty} u_0^2 + (u_0')^2 dx < +\infty$$
+qui implique que $u_0$ est asymptotiquement nulle (et continue\footnote{Cette condition étant équivalente à dire que $u_0 \in H^1(\R)$ et sachant qu'en dimension 1 nous avons $H^1(\R) \subset C^0(\R)$, alors $u_0$ est bien continue.}).
+
+
+On définit ainsi $E(u) = \int_{-\infty}^{+\infty} u^2 + (\partial_x u)^2 dx$ et $E_0 =\int_{-\infty}^{+\infty} u_0^2 + (u_0')^2 \text{ } dx $ les fonctionnelles d'énergie associées à $u$.
+
+
+$E(u) = E_0$  signifie que $u$ est d'énergie finie et constante sur l'intervalle $[0,T]$. En particulier, $\forall t \in [0,T]$, $u$ est dotée des mêmes propriétés que $u_0$,
+à savoir décroissance à l'infinie et continuité. Ces propriétés étant persistantes sur tout l'intervalle $[0,T]$, on peut construire une solution $\forall t \geq 0$ en itérant l'argument, par exemple en
+translatant l'intervalle de temps de $T$ et recommençant tout le raisonnement avec comme condition initiale $u(\cdot,T)$.
+
+Les conditions mises en exergue se traduisent ainsi par $u_0 \in H^1(\R) \cap \mathcal{C}^2(\R)$. Sous ces conditions nous avons donc existence d'une solution forte du problème, valable pour tout temps. 
+C'est à dire $u$ vérifie le problème \ref{BBM} avec la condition initiale $u(x,0) = u_0(x)$ et $u \in \mathcal{C}_{\infty}^{2,\infty}$ est asymptotiquement nulle.
+
+Nous résumons tout cela dans le théorème suivant, que nous venons de démontrer :
+
+\begin{theorembox}
+\begin{theorem}
+    Si $u_0 \in \mathcal{C}^2(\R) \cap H^1(\R)$, alors il existe une solution dans $\mathcal{C}_{\infty}^{2,\infty}$ au problème :
+    
+    $\begin{cases}
+        \partial_t u + \partial_x u + u\partial_x u - \partial_{xxt}^3 u = 0 \\
+        u(\cdot,0) = u_0
+    \end{cases}$
+
+    avec $u$ et $\partial_xu$ asymptotiquement nulles ainsi que leurs dérivées suivant $t$.
+\end{theorem}
+\end{theorembox}
+
+Nous définissons l'espace suivant :
+$$H^1_T(\R \times [0,T]) = \Big\{ v: \R \times [0,T] \to \R \ \big| \ \forall t \in [0,T], \ v(\cdot, t) \in H^1(\R) \Big\} $$
+Muni de la norme suivante : $\|v\|_{H^1_T} = \underset{t \in [0,T]}{\sup}\|v (\cdot, t) \|_{H^1}$
+
+Alors sous les conditions du théorème d'existence, il existe une solution $u \in H^1_{\infty} (\R\times \R_+) \cap \mathcal{C}^{2,\infty}_{\infty}(\R \times \R_+)$
+
+\section{Unicité}
+
+
+Soient $u_1$ et $u_2$ deux solutions de l'équation \ref{BBM} qui vérifient les propriétés garanties
+par le théorème d'existence.
+On pose $w = u_1 - u_2$
+
+En soustrayant l'équation vérifiée par $u_1$ par celle vérifiée par $u_2$, nous obtenons une nouvelle équation :
+
+$$ \partial_t w + \partial_x w + \partial_x \bigl( w(u_1 + u_2) \bigr) - \partial_{txx}w = 0 $$
+
+
+Par les propriétés de $u_1$ et $u_2$, $w$ est dans $\mathcal{C}^{2,\infty}_{\infty}$ et est asymptotiquement nulle (ainsi que sa dérivée première suivant $x$, toutes les dérivées suivant $t$ et tous les termes croisés).
+
+Soit $[-R,R]$ un volume contrôle, nous allons multiplier l'équation par $w$ et intégrer par partie. 
+
+Ce qui nous donne :
+
+$$\int_{-R}^{R} w\partial_t w + \partial_x w \partial_{tx} w - \int_{-R}^{R} \frac{1}{2}w(u_1 + u_2)\partial_x w dx + \big[ \frac{1}{2}w^2 + \frac{1}{2} w^2 (u_1 + u_2) - w\partial_{tx}w \big]_{-R}^{R} = 0 $$
+
+Le crochet s'annule lorsque $R \longrightarrow +\infty$ car $u_1$, $u_2$, $w$ et $\partial_{tx}w$ sont asymptotiquement nulles.
+
+Pour le second terme, puisque $u_1$ et $u_2$ sont bornées $\forall t \geq 0$, nous avons : 
+
+$$\biggl| \int_{-\infty}^{+\infty} (u_1 + u_2)w\partial_x w dx\biggr| \leq \frac{1}{2} \bigl( \underset{x \in \R}{\sup} |u_1 + u_2| \bigr) \|w\|_{H^1}^2 := \frac{1}{2}C(t) \|w\|_{H^1}^2 $$
+
+Et donc nous avons également la convergence du premier terme, qui peut se réecrire (par théorème de dérivation, puisque $\partial_t w$ et $\partial_{tx} w$ sont bornées en $t$) :
+
+\begin{equation*}
+\begin{split}
+    \int_{-\infty}^{+\infty} w \partial_t w + \partial_x w \partial_{tx}w dx &= \int_{-\infty}^{+\infty} \frac{1}{2} \partial_t \bigl( w^2 + \partial_x w ^2 \bigr) dx \\
+    &= \frac{1}{2} \frac{d}{dt} \|w\|_{H^1}^2 := \frac{1}{2} \frac{d}{dt} E(w)
+\end{split}
+\end{equation*}
+
+Tout cela nous mène à l'inégalité différentielle suivante :
+
+$$ \frac{1}{2} \frac{d}{dt} E(w) \leq \frac{1}{2}C(t) E(w) $$
+
+Et ainsi par le lemme de Grönwall, 
+
+$$ E(w) \leq E(w)_{|t=0} \text{exp}\biggl(\frac{1}{2}\int_{0}^{t} C(\tau)d\tau \biggr) $$
+
+Maintenant en supposant que $u_1$ et $u_2$ partent de la même condition initiale $u_0$, nous avons $w(x,0) = 0$, $\forall x \in \R$.
+Mais dans ce cas $E(w)_{|t=0} = 0$, et donc $E(w)=0$
+Nous avons alors $\|w\|_{H^1}^2 = 0$, ce qui donne $u_1 = u_2$
+
+Nous venons donc de montrer l'unicité des solutions de l'équation pour une condition initiale donnée.
+
+\section{Lois de conservation associées}
+
+Parmi les points de comparaison intéressants entre le modèle KdV et BBM, nous nous penchons sur les lois de conservation associées aux modèles respectifs.
+Les lois de conservations sont des caractéristiques communes liées aux équations issues de la physique, qui décrivent la conservation d'une quantité physique (masse, énergie, mouvement...) à travers le temps. Ces équations donnent des indications sur le comportement de solutions à travers le temps (formation de chocs, interactions entre ondes solitaires, dispersion...). 
+Une différence notable entre le modèle KdV et BBM se situe au niveau de leurs lois de conservations : l'une en admet une infinité et l'autre en admet seulement trois. Cette différence joue un rôle important dans la connaissance que nous avons de ces deux modèles et de leurs solutions. 
+
+\vspace{1em}
+
+Avant de nous pencher sur les différences entre BBM et KdV, nous présentons un exemple de loi de conservation. Prenons pour illustration la conservation de la masse qui s'écrit de la façon suivante (où $u$ est une vitesse) :
+$$\partial_t \rho + \partial_x(\rho u) = 0$$
+En supposant que $\rho$ et $\partial_x(\rho u)$ sont intégrables sur $\mathbb{R}$ et que $\rho u \xrightarrow[|x| \to +\infty]{} C^{te}$, nous écrivons :
+$$\frac{d}{dt}\int_{-\infty}^{+\infty} \rho \ dx = - \int_{-\infty}^{+\infty} \partial_x(\rho u) \ dx = - \big[\rho u\big]_{-\infty}^{+\infty} = 0$$
+Nous obtenons alors la conservation de la masse à travers le temps :
+$$\int_{-\infty}^{+\infty} \rho \ dx = C^{te}$$
+
+Nous définissons alors une loi de conservation :
+\begin{definitionbox}
+\begin{definition}
+    Soit $\Delta(x,t,u,\partial_tu, \partial_xu, \dots) = 0$ une équation aux dérivées partielles.
+
+    \vspace{1em}
+    Une loi de conservation est une équation de la forme $\partial_tT + \partial_x X =0$ qui est satisfaite par toutes les solutions de l'équation $\Delta = 0$.
+
+    \vspace{1em}
+
+    On appelle $T$ la densité conservative et $X$ le flux conservatif.
+\end{definition}
+\end{definitionbox}
+
+Dans la littérature, on qualifie généralement la quantité $\int_{\mathbb{R}} T \ dx$ de constante du mouvement.
+
+% Puisqu'il est ici question de lois de conservation indépendantes, nous donnons la définition suivante :
+% \begin{definitionbox}
+% \begin{definition}
+%     Des lois de conservations sont dites dépendantes si pour $(T_1, \dots, T_n)$ densités il existe $(c_1, \dots, c_n)$ des réels tels que 
+%     $$c_1T_1 + \dots + c_n T_n = \partial_xP$$
+%     pour un certain $P$.
+% \end{definition}
+% \end{definitionbox}
+
+Une loi de conservation est dite dépendante d'autres lois de conservation si cette dernière est exprimable comme combinaison linéaire des précédentes lois. Inversement, une loi de conservation est indépendante d'autres lois si elle n'est pas exprimable comme combinaison linéaire des autres lois de conservation.
+
+\subsection{Lois de conservation pour BBM}
+
+Pour le cas de l'équation BBM, il n'existe que trois lois de conservation indépendante. Ces trois lois sont données par le résultat suivant, issu d'un article de P. J. Olver \cite{conservation} : 
+
+\begin{theorembox}
+\begin{theorem}
+    Les seules lois de conservations indépendantes non triviales de l'équation BBM $\partial_tu + \partial_xu +u\partial_xu - \partial_{txx}u = 0$ sont :
+    \begin{enumerate}
+        \item $\partial_tu - \partial_x \bigg(\partial_{xt}u + \frac{1}{2}u^2\bigg) = 0$
+        \item $\partial_t\Big( \frac{1}{2}u^2 + \frac{1}{2}(\partial_xu)^2 \Big) - \partial_x\Big(u\partial_{xt}u + \frac{1}{3}u^3\Big) = 0$
+        \item $\partial_t\bigg(\frac{1}{3}u^3\bigg) + \partial_x\bigg( (\partial_tu)^2 - (\partial_{xt}u)^2 - u^2\partial_{xt}u - \frac{1}{4}u^4 \bigg) = 0$
+    \end{enumerate}
+\end{theorem}
+\end{theorembox}
+
+Les deux premières lois ont été établies dans les sections précédentes dédiées à l'existence et unicité des solutions. 
+La troisième loi est démontrée dans \cite{conservation}, et il est également montré que l'équation n'admet pas d'autre loi indépendante. 
+
+\vspace{1em}
+
+En nous plaçant dans les conditions du théorème d'existence démontré précédement, la solution $u$ de l'équation est dans l'espace $\mathcal{C}^{2,\infty}_{\infty}$ et $u$,$\partial_xu$ ainsi que leurs dérivées suivant $t$ sont asymptotiquement nulles $\forall t \in [0,+\infty[$.
+
+En admettant que les conditions du théorème de dérivation sous le signe intégral sont réunies (ce qui a été montré plusieurs fois dans les section précédentes), la première loi donne la conservation de la masse :
+\begin{equation*}
+\begin{split}
+    &\frac{d}{dt}\int_{-\infty}^{+\infty} u \ dx = \bigg[ \partial_{xt}u + \frac{1}{2}u^2 \bigg]_{-\infty}^{+\infty} = 0 \\
+    &\Rightarrow \int_{-\infty}^{+\infty} u \ dx = C^{te}
+\end{split}
+\end{equation*}
+
+A partir de la deuxième loi, nous établissons la conservation de l'énergie :
+\begin{equation*}
+\begin{split}
+    &\frac{1}{2} \frac{d}{dt} \int_{-\infty}^{+\infty} u^2 + (\partial_xu)^2 \ dx = \bigg[ u\partial_{xt}u + \frac{1}{3}u^3 \bigg]_{-\infty}^{+\infty} = 0 \\
+    &\Leftrightarrow \frac{1}{2}\frac{d}{dt} \| u \|_{H^1}^2 = 0 \\
+    &\Rightarrow \| u \|_{H^1} = C^{te}
+\end{split}
+\end{equation*}
+
+La troisième loi établi la conservation d'une autre quantité :
+\begin{equation*}
+\begin{split}
+    & \frac{d}{dt}\int_{-\infty}^{+\infty} \frac{1}{3}u^3 \ dx = \bigg[ (\partial_{xt}u)^2 + u^2\partial_{xt}u + \frac{1}{4}u^4 - (\partial_tu)^2 \bigg]_{-\infty}^{+\infty} = 0  \\
+    & \Rightarrow \int_{-\infty}^{+\infty} u^3 \ dx = C^{te}
+\end{split}
+\end{equation*}
+
+\subsection{A propos des lois de conservation de KdV}
+
+Nous l'avons évoqué en ouverture du chapitre, l'équation KdV quant à elle admet une infinité de lois de conservation, comme démontré dans \cite{soliton}.
+Cette infinité de lois donne accès à des informations riches sur l'équation, les différentes solutions et leur comportement asymptotique. L'un des avantages par rapport à l'équation BBM est que l'équation KdV est exactement résoluble. Il est possible d'en obtenir les solutions par l'étude du problème de diffusion inverse (\textit{inverse scattering problem}), permettant de reconstruire l'évolution en temps des solutions à partir des données décrivant la diffusion.
+Plus précisément nous procédons de cette manière :
+
+En partant du problème suivant (issu de l'équation de KdV adimensionnée) :
+$$\begin{cases}
+    \partial_tu + 6u\partial_xu +\partial_x^3u =0 \\
+    u(\cdot,0) = u_0
+\end{cases}$$
+Nous allons montrer que le problème a un lien avec le problème de Sturm-Liouville (raccroché à une théorie très riche qui s'intéresse aux valeurs propres des opérateurs différentiels d'ordre 2 définissant des équations différentielles ordinaires linéaires), pour cela considérons la transformation de Miura \footnote{(1938 - 2018). Mathématicien américain ayant eu des contributions sur les lois de conservations associées aux équations d'ondes non linéaires, et ayant découvert la transformation de diffusion inverse que nous utilisons ici, permettant ainsi de résoudre analytiquement KdV}
+donnée par : $u = v^2 + \partial_xv$ (où $v$ est une fonction que nous ne définissons pas satisfaisant l'égalité)
+
+En injectant cette transformation dans l'équation, nous trouvons une nouvelle équation :
+$$\Big(2v + \partial_x\Big)\Big( \partial_t v - 6 v^2\partial_xv + \partial_x^3v \Big) = 0$$
+Ainsi, si $v$ est solution de $\partial_t v - 6 v^2\partial_xv + \partial_x^3v =$, alors $v$ est solution de l'équation KdV.
+La transformation de Miura définit ce qu'on appelle parfois une équation de Ricatti \footnote{Il s'agît d'une équation différentielle ordinaire non linéaire dont le second membre est un polynôme du second degré en l'inconnue.}, une manière de linéariser cette équation se fait en introduisant le changement de variable $v = \frac{\partial_x\psi}{\psi}$, pour une certaine fonction $\psi(x;t)$ différentiable et ne s'annulant pas (on note ';' pour séparer les variables de temps et d'espace pour signifier que nous considérons des transformations indépendament de la variable de temps, ici le temps devient un paramètre de l'équation qui servira dans la suite pour faire évoluer les informations).
+De cette façon, la transformation se réecrit :
+$$\partial_x^2\psi - u\psi = 0$$
+Ceci est une équation de Sturm-Liouville, (de façon plus formelle sous la forme $\frac{d}{dx}\big(1\cdot\frac{d}{dx}\psi\big) - 1\cdot\psi = 0$ ).
+En considérant le changement de variables $u \mapsto \lambda + u(x + 6\lambda t,t)$, on retrouve l'équation de Sturm-Liouville suivante, avec $u$ potentiel et $\lambda$ valeur propre de l'équation :
+$$\partial_x^2 \psi + (\lambda + u)\psi = 0$$
+
+Cette équation est fréquement rencontrée en mécanique quantique puisqu'elle correspond en réalité à l'équation de Schrödinger stationnaire. 
+Pour garantir l'existence de solutions à cette équation, il faut que $u$ soit à décroissance "suffisamment" rapide à l'infini. Ce que nous pouvons traduire par l'appartenance de $u$ à l'espace de Faddeev $L^1_1(\R)$ définit par :
+$$L^1_1(\R) = \bigg\{ u:\R \to \R \ \text{ mesurable} \ \bigg| \int_{\R} |u(x)|(1 + |x|) \ dx < +\infty \bigg\}$$
+A partir de cette transformation en un problème linéaire, nous pouvons extraire ce que nous appelons les données scatterées (\textit{scattered data}) qui correspondent aux informations de diffusion d'une onde plane par un potentiel (ici $u$). 
+En théorie spectrale, le spectre d'un opérateur autoadjoint est contenu dans la droite réelle et se décompose en un spectre continu et un spectre discret, nous faisons la différence entre $\lambda >0$ où le spectre est continu et $\lambda < 0$ où le spectre est discret (le cas $\lambda = 0$ ne se produisant que dans le cas où $u := 0$).
+Dans la cas du spectre continu ($\lambda >0$), on note l'apparition d'un coefficient de reflexion qui décrit comment une onde plane incidente est réflechie par le potentiel $u$. Pour le spectre discret ($\lambda<0$), on note $\lambda_j := -\kappa_j^2$ les $N$ valeurs propres discretes et $c_j$ des coefficients de normalisation associés à chaque $\lambda_j$.
+
+Les données scatterées pour KdV sont l'ensemble $S(0) = \big\{ R(\lambda,0),(\lambda_j,c_j)_{1 \leq j \leq N}\big\}$
+
+A partir de la connaissance de ces données il est possible de reconstruire le profil de $u$. Les données scatterées sont décrites par le comportement asymptotique des fonctions propres $\psi$ :
+
+\underline{Si $\lambda > 0$ :} $$\psi(x) \sim \begin{cases}
+    e^{-i\sqrt{\lambda}x} + R(\sqrt{\lambda})e^{i\sqrt{\lambda}x}, &x \to +\infty \\
+    T(\sqrt{\lambda})e^{-i\sqrt{\lambda}x}, &x \to -\infty
+\end{cases} $$
+Où $T$ est le coefficient de transmission qui décrit l'amplitude de l'onde transmise.
+
+\underline{Si $\lambda < 0$} $$\psi_n(x) \underset{x\to +\infty}{\sim} c_ne^{-\kappa_n x}$$
+
+Après avoir fait évoluer les données scatterées dans le temps, la solution $u$ est reconstruite par:
+$$u(x) = \frac{d}{dx} K(x,x)$$
+Où $K(x,z)$ est la solution de l'équation de Marchenko \cite{soliton}.
+
+\section{Solutions particulières}
+
+L'une des solutions particulières des équations de KdV et BBM est une onde solitaire que nous appelons soliton. 
+Cette solution a la particularité de se propager sans déformer le milieu qu'elle parcourt mais également de reprendre sa forme initiale après avoir interagit avec un autre soliton.
+Au delà de ces aspects particuliers, le soliton permet de comprendre la propagation des tsunami et pourquoi ces derniers se déplacent sans effets notables sur les eaux profondes et les navires en pleine mer n'y sont pas sensibles. Les solitons sont également présents dans d'autres domaines de la physique et de l'ingéniérie, notamment en optique où ce dernier est utilisé pour des transmissions longue distance dans des réseaux optiques de télécommunication. En mécanique quantique, le soliton est une solution de l'équation de Schrödinger non linéaire dans le cas de la propagation d'un signal lumineux dans une fibre. Nous pouvons encore citer le cas de la mécanique lagrangienne, où ces derniers sont observables lors du mouvement d'une chaîne de pendules couplés entre eux.
+
+Nous allons nous intéresser dans ce chapitre à l'obtention de l'expression du profil du soliton. Pour cela nous allons reprendre l'équation KdV dans une forme légèrement différente et y faire un changement de variable. Cette première partie aura pour objectif de proposer une démarche alternative à la dérivation de l'équation, cette fois ci en partant des équations bilan de la mécanique des fluides, mais sans pour autant détailler complètement la dérivation, cela ayant déjà été l'objet dans le chapitre 2.
+\vspace{1em}
+
+\subsection{Derivation alternative de KdV}
+
+Nous reprenons les hypothèses faites dans le chapitre 1 concernant la dérivation de l'équation de KdV, c'est à dire que nous considérons que le fluide est homogène, parfait (nous négligeons les effets de la viscosité et la conductivité thermique), incompressible et irrotationnel.
+Un modèle adapté à ce jeu d'hypothèse serait les équations d'Euler, s'écrivant en notant $\textbf{u}$ la vitesse d'une particule de fluide :
+
+$$\begin{cases}
+    \partial_t (\rho \textbf{u}) + \nabla \cdot(\rho \textbf{u} \otimes \textbf{u}) = - \nabla p + \rho \textbf{g} \quad &\text{conservation de la quantité de mouvement} \\
+    \partial_t\rho + \nabla \cdot (\rho \textbf{u})= 0 \quad &\text{conservation de la masse} \\
+    \nabla \cdot \textbf{u} = 0 &\text{incompressibilité} \\
+    \nabla \times \textbf{u} = 0 &\text{irrotationnalité} 
+    
+\end{cases}$$
+
+Nous supposons que l'altitude de l'eau au repos se trouve à $h_0$. Nous notons $\eta(x,t)$ la déformation au point $(x,t)$ de la surface au repos. Ainsi la hauteur de la vague est comprise entre $h_0$ et $h_0 + \eta (x,t)$. La pression $p$ vérifie $p\big(x,h_0 + \eta(x,t),t\big) = p_0$, c'est à dire que la pression s'exerçant sur le fluide à l'altitude $h_0 + \eta(x,t)$ est constante et correspond à la pression atmosphérique, que nous notons $p_0$. Nous considérons la masse volumique $\rho$ constante strictement positive.
+Ces équations peuvent se réecrire de façon plus condensées pour donner :
+
+$$\begin{cases}
+    \partial_t \textbf{u} + (\textbf{u} \cdot \nabla)\textbf{u} = - \frac{1}{\rho}\nabla p + \textbf{g} \\
+    \nabla \cdot \textbf{u} = 0 \\
+    \nabla \times \textbf{u} = 0
+\end{cases}$$
+
+Puisque nous nous intéressons à une coupe du fluide à un instant $t$, nous posons $\textbf{u}(x,y,t) = \big( u(x,y,t), v(x,y,t) \big)$ le champ de vitesse des particules du fluide. 
+
+Dans le cas du champ de vitesse considéré, les équations d'Euler s'écrivent :
+
+$$\begin{cases}
+    \partial_t u + u\partial_x u + v\partial_y u = - \frac{1}{\rho} \partial_x p \\
+    \partial_t v +  u\partial_x v + v \partial_y v = - \frac{1}{\rho}\partial_y p - g \\
+    \partial_xu + \partial_y v = 0 \\
+    \partial_y u - \partial_x v = 0
+\end{cases}$$
+
+Nous rajoutons une nouvelle condition à ce système, nous imposons qu'une particule de fluide constituant la surface reste à la surface. Ce qui se traduit par la nouvelle équation $v = \partial_t \eta + u\partial_x \eta$.
+De même, nous imposons une condition d'imperméabilité au fond de l'eau, que nous écrivons $v(x,0) = 0, \quad \forall x \in \mathbb{R}$.
+
+Les équations décrivant le mouvement d'une vague s'écrivent alors :
+
+$$\begin{cases}
+    \partial_t u + u\partial_x u + v\partial_y u = - \frac{1}{\rho} \partial_x p, & 0 \leq y \leq h_0 + \eta(x,t) \\
+    \partial_t v +  u\partial_x v + v \partial_y v = - \frac{1}{\rho}\partial_y p - g, & 0 \leq y \leq h_0 + \eta(x,t)\\
+    \partial_xu + \partial_y v = 0, & 0 \leq y \leq h_0 + \eta(x,t)\\
+    \partial_y u - \partial_x v = 0, & 0 \leq y \leq h_0 + \eta(x,t) \\
+    p(x,y,t) = p_0, & y = h_0 + \eta(x,t) \\
+    v = \partial_t \eta + u \partial_x \eta, & y = h_0 + \eta(x,t) \\
+    v = 0, & y = 0
+\end{cases}$$
+
+Une fois ce système posé, la suite de la dérivation revient à introduire des paramètres de profondeur, d'amplitude et de longueur des vagues, adimensionner les équations précédentes, faire des changements d'echelle par rapport au paramètre d'amplitude et des changements de variable afin d'éliminer le paramètre de profondeur et ensuite faire des développements asymptotiques par rapport au paramètre d'amplitude. 
+Nous ne détaillerons cependant pas plus la dérivation de l'équation KdV à partir des équations d'Euler ici, nous ne posons que le cadre de mécanique des fluides afin d'enrichir les possibilités de dérivation de cette équation.
+
+A partir de ces équations nous obtenons l'expression suivante pour le profil $\eta$ d'une vague se propageant dans un milieu dispersif non linéaire en faible profondeur : 
+$$\frac{1}{\sqrt{gh_0}}\partial_t \eta + \partial_x \eta + \frac{3}{2h_0}\eta \partial_x \eta + \frac{h_0^2}{6} \partial_x^3 \eta = 0$$
+
+On va se placer dans un repère mobile en posant $X = x - c_0t$ et $T = t$, où nous posons $c_0 = \sqrt{gh_0}$.
+
+Les dérivées de $\eta$ s'expriment maintenant de la façon suivante,
+
+$\begin{cases}
+     \partial_xX = 1 \\
+     \partial_x T = 0 \\
+     \partial_t X = -c_0 \\
+     \partial_t T = 1 \\
+\end{cases}$ $\Rightarrow$
+$\begin{cases}
+    \partial_t \eta(X,T) = -c_0\partial_X \eta(X,T) + \partial_T \eta(X,T) \\
+    \partial_x \eta(X,T) = \partial_X \eta(X,T)
+\end{cases}$
+
+L'équation devient : 
+
+\begin{equation*}
+\begin{split}
+    \frac{1}{c_0}\Big(\partial_T \eta - c_0 \partial_X \eta \Big) + \partial_X \eta + \frac{3}{2h_0}\eta \partial_X \eta + \frac{h_0^2}{6}\partial_X^3 \eta &= 0 \\
+    \Leftrightarrow \frac{1}{c_0}\partial_T \eta + \frac{3}{2h_0} \eta \partial_X \eta + \frac{h_0^2}{6} \partial_X^3 \eta = 0
+\end{split}
+\end{equation*}
+
+Ce changement de variable fait disparaître le terme en $\partial_X$. 
+% En posant maintenant les variables adimensionnées $\phi = \frac{\eta}{h}$, $\xi = \frac{X}{X_0}$ et $\tau = \frac{T}{T_0}$, où $X_0$ est une longueur de référence et $\tau$ un temps de référence.
+
+\begin{remarkbox}
+\begin{remark}
+    L'équation adimensionnée s'écrit finalement :
+
+    $$\partial_t \phi + 6 \phi \partial_x \phi + \partial_x^3 \phi = 0$$
+
+    % En effet, en considérant le changement de variables $\begin{cases}
+    %     t = \frac{1}{c_0}\tau \\
+    %     x = \Big( \frac{h_0^2}{6} \Big)^{\frac{1}{3}} \xi \\
+    %     \eta = \phi - \frac{2h_0}{c_0}
+    % \end{cases}$
+
+    % On a $\frac{1}{c_0} \partial_t \eta = \partial_{\tau} \phi$, $$
+
+    On rencontre également d'autres formes dans la littérature, comme :
+    \begin{enumerate}
+        \item $\partial_t \phi - 6\phi \partial_x \phi + \partial_x^3 \phi = 0$
+        \item $\partial_t \phi + \partial_x\phi + \phi\partial_x\phi + \partial_x^3\phi = 0$
+    \end{enumerate}
+
+    La constante 6 devant le terme non-linéaire est conventionnelle et ne reflète rien sur la physique du problème étudié.
+    
+\end{remark}
+\end{remarkbox}
+
+\subsection{Expression du profil du soliton}
+
+Nous cherchons maintenant une solution se propageant à vitesse $c$ constante. Nous cherchons la solution sous la forme $u(s) = u(x - ct)$.\cite{soliton}
+
+On suppose alors que $u$ vérifie l'équation,
+$$\partial_t u + \frac{3c}{2h_0}u \partial_xu + \frac{ch_0^2}{6}\partial_x^3u = 0$$
+
+$\begin{cases}
+    \partial_t u(s) = -c \partial_s u(s) = - c u'(s) \\
+    \partial_x u(s) = \partial_su(s) = u'(s)
+\end{cases} \quad  \Rightarrow \quad -cu' + \frac{3c}{2h_0}uu' + \frac{ch_0^2}{6}u''' = 0$
+
+\vspace{1em}
+
+En intégrant une première fois suivant nous obtenons : 
+\begin{equation*}
+\begin{split}
+    \int -c_0u' + \frac{3c}{2h_0}uu' + \frac{ch_0^2}{6}u''' \ ds &= C_0 \\
+    \Rightarrow -cu + \frac{3c}{4h_0}u^2 + \frac{ch_0^3}{6}u'' &= C_0
+\end{split}
+\end{equation*}
+Où $C_0$ est une constante d'intégration. 
+Puisque nous nous intéressons au profil d'une onde solitaire, un choix possible serait de prendre $u$ telle que $u$, $u'$ et $u''$ sont asymptotiquement nulles. Donc $u,u',u'' \xrightarrow[|x| \to +\infty]{} 0$.
+En appliquant ces conditions limites à l'équation intégrée, nous obtenons $C_0 = 0$.
+
+L'équation est donc :
+$$-cu + \frac{3c}{4h_0}u^2 + \frac{ch_0^2}{6}u'' = 0$$
+En multipliant par $u'$ puis en intégrant une nouvelle fois nous obtenons :
+\begin{equation*}
+\begin{split}
+    \int -cuu' + \frac{2c}{h_0}u^2u' + \frac{ch_0^2}{6}u''u' \ ds &= C_1 \\
+    \Rightarrow -\frac{c}{2}u^2 + \frac{3c}{12h_0}u^3 + \frac{ch_0^2}{12}(u')^2 &= C_1
+\end{split}
+\end{equation*}
+Une nouvelle fois en appliquant les conditions aux limites nous obtenons $C_1 = 0$, et l'équation vérifiée par $u$ est :
+\begin{equation*}
+\begin{split}
+    -6c u^2 + \frac{3c}{h_0}u^3 + ch_0^2(u')^2 &= 0 \\
+    \Leftrightarrow u^2\bigg(\frac{3c}{h_0}u -6c \bigg) + ch_0^2(u')^2 &= 0 \\
+    \Leftrightarrow ch_0^2(u')^2 &= u^2\bigg(6c - \frac{3c}{h_0}u \bigg) \\
+    \Leftrightarrow \frac{u'}{u\sqrt{\frac{6}{h_0^2} - \frac{3}{h_0^3}u}} &= 1
+\end{split}
+\end{equation*}
+
+En remarquant que $\text{Arctanh}(x)' = \frac{1}{1 - x^2}$, alors en considérant le changement de variables $u = \sqrt{1 - x}$, (avec $x = 1 - u^2$, $\frac{dx}{du} = -2u$) \cite{soliton2} : 
+\begin{equation*}
+\begin{split}
+    \int \frac{dx}{x\sqrt{1 - x}} = \int \frac{-2du}{(1 - u^2)u} &= -2 \int \frac{du}{1 - u^2} \\
+    &= -2\text{Arctanh}(u) + C
+\end{split}
+\end{equation*}
+
+Ce qui donne finalement :
+$$\int \frac{dx}{x\sqrt{1 - x}} = -2\text{Arctanh}\big(\sqrt{1 - x}\big) + C$$
+
+En repartant de l'expression vérifiée par $u$:
+\begin{equation*}
+\begin{split}
+    \frac{u'}{u\sqrt{\frac{6}{h_0^2} - \frac{3}{h_0^3}u}} =\frac{u'}{u\sqrt{\frac{6}{h_0^2}}\sqrt{1 - \frac{1}{2h_0}u}} &= 1 \\
+    \Leftrightarrow \frac{u'}{u\sqrt{1 - \frac{1}{2h_0}u}} &= \frac{\sqrt{6}}{h_0} 
+\end{split}
+\end{equation*}
+
+Puis en intégrant,
+\begin{equation*}
+\begin{split}
+    \int \frac{u'}{u\sqrt{1 - \frac{1}{2h_0}u}}ds &= \frac{\sqrt{6}}{h_0}s \\
+    \Leftrightarrow -2 \text{Arctanh}\Bigg(\sqrt{1 - \frac{1}{2h_0}u} \Bigg) &= \frac{\sqrt{6}}{h_0}s \\
+    \Leftrightarrow \text{Arctanh}\Bigg(\sqrt{1 - \frac{1}{2h_0}u} \Bigg) &= -\frac{\sqrt{6}}{2h_0}s
+\end{split}
+\end{equation*}
+Et finalement en isolant $u$ nous retrouvons l'expression suivante :
+$$u(s) = 2h_0\Bigg( 1 - \text{tanh}^2\bigg(\frac{\sqrt{6}}{2h_0}s\bigg) \Bigg)$$
+Soit, en remarquant que $1 -\text{tanh}^2(x) = \frac{1}{\text{cosh}^2(x)} = \text{sech}^2(x)$, on peut écrire :
+$$u(s) = 2h_0\text{sech}^2\bigg(\frac{\sqrt{6}}{2h_0}s\bigg)$$
+Où sech désigne la fonction sécante hyperbolique.
+
+En nous rappelant que nous cherchions une solution de la forme $u(x - ct)$, on trouve :
+
+$$\eta(x,t) = 2h_0\text{sech}^2\bigg( \frac{\sqrt{6}}{2h_0}\Big(x - ct\Big) \bigg)$$
+
+En posant cette fois $c = c_0\big(1 + \frac{h_0}{2h}\big)$, où $h$ est la profondeur de l'eau et $h_0$ la hauteur de l'eau au repos.
+
+$$\eta(x,t) = 2h_0\text{sech}^2\bigg( \frac{\sqrt{6}}{2h_0}\Big(x - c_0\Big(1 + \frac{h_0}{2h}\Big)t \Big) \Bigg)$$
+
+\begin{remarkbox}
+\begin{remark}
+    L'expression du profil de cette solution n'est pas unique et dépend en réalité de la forme de l'équation choisie au départ. Nous avons fait le choix ici de prendre initialement l'équation dimensionnée, faisant apparaître certains coefficients. Un choix différent aurait mené à des coefficients différents (par exemple la longueur d'onde ou l'amplitude) avec peut être une normalisation. Les formes de l'équation KdV étant multiples et les méthodes d'obtention du soliton pouvant varier, il existe beaucoup de variations possibles pour l'expression du profil du soliton. 
+\end{remark}
+\end{remarkbox}
+
+% Pour les simulations numériques, nous retiendrons finalement la forme suivante : 
+% $$\eta(x,t) = 3(c - 1)\text{sech}^2\Bigg(\frac{1}{2}\sqrt{\frac{c - 1}{c}}(x - ct)\Bigg)$$
+% qui ne dépend que de la vitesse de l'onde $c>1$ et admet une forme plus élégante que la précédente.
+
+L'équation BBM admet également une onde solitaire comme solution, qui n'est cette fois pas un soliton : après interaction avec une autre onde une queue d'oscillation est générée et le profil n'est plus le même. 
+
+Appliquons le raisonnement précédent à l'équation $\partial_t u + \partial_x u + u \partial_x u - \partial_{txx}u = 0$.
+Nous cherchons une solution se propageant vers la droite à vitesse $c$. Cette solution devrait être de la forme $f(x,t) = Au(x - ct)$, où $A$ est l'amplitude et $f$ est la fonction associée au profil de la solution.
+
+En dérivant puis en injectant dans l'équation, nous obtenons :
+$$ -Acu'(x - ct) + A u'(x-ct) + A^2u(x-ct)u'(x-ct) + Acu^{(3)}(x-ct) = 0 $$
+En posant $s = x-ct$ et en simplifiant par $A$, l'expression donne :
+$$ (1-c)u'(s) +Au(s)u'(s) + cu^{(3)}(s) =0 $$
+En intégrant puis en imposant la condition que $u$ et ses dérivées sont asymptotiquement nulles, nous obtenons :
+$$ (1-c)u(s) + \frac{A}{2}u(s)^2 + cu''(s) = 0 $$
+En multipliant l'équation ainsi obtenue par $u'(s)$ et en intégrant (et en réutilisant les conditions de nullité asymptotique), nous avons :
+$$ \frac{1-c}{2}u(s)^2 + \frac{A}{6}u(s)^3 + \frac{c}{2}\big(u'(s)\big)^2 = 0 $$
+Qui se transforme en l'équation suivante :
+$$ \frac{u'(s)}{u(s)\sqrt{\frac{c-1}{c} - \frac{A}{3c}u(s) }} =1 $$
+Ou encore :
+$$\frac{u'(s)}{u(s)\sqrt{1 - \frac{A}{3(c-1)}u(s) }} =\sqrt{\frac{c-1}{c}}$$
+Qui s'intègre encore une fois, d'après l'astuce précédente sur la fonction arctangente hyperbolique :
+$$ -2\text{Arctanh}\Bigg(\sqrt{1 - \frac{A}{3(c-1)}}u(s)\Bigg) = \sqrt{\frac{c-1}{c}}s$$
+Nous avons encore une fois appliqué les conditions aux limites pour nous débarasser de la constante d'intégration.
+En appliquant ensuite la fonction réciproque et en nous rappelant des propriétés de la fonction tangente hyperbolique :
+$$ u(s) = \frac{3(c-1)}{A} \text{sech}^2\Bigg( \frac{1}{2} \sqrt{\frac{c-1}{c}} s \Bigg) = \frac{3(c-1)}{A} \text{sech}^2\Bigg(\frac{1}{2}\sqrt{\frac{c-1}{c}} s \Bigg) $$
+Et en écrivant l'expression finale du soliton $Au(x - ct)$, nous nous retrouvons avec un profil de cette forme :
+$$ f(x,t) = 3(c-1) \text{sech}^2\Bigg( \frac{1}{2}\sqrt{\frac{c-1}{c}} (x - ct) \Bigg) $$
+
+% Cette solution s'écrit : 
+
+% $$\eta(x,t) = 3 \frac{c^2}{1 - c^2} \text{sech}^2\Bigg(\frac{1}{2}\bigg(cx - \frac{ct}{1 - c^2} + \delta \bigg)\Bigg)$$
+
+% Où $\delta$ est un déphasage horizontal à l'instant initial.
+Initialement, d'après les premières études numériques, il a été envisagé que ce type d'onde solitaire soit un soliton, mais d'autres études ont mis en évidence l'apparition d'une onde de raréfaction après interaction.\cite{conservation}
+L'équation BBM n'admet, en réalité, pas de soliton à proprement parler. Les ondes solitaires solution de l'équation BBM ne satisfont pas les propriétés d'interactions élastiques propres aux solitons.
+
+\begin{remarkbox}
+\begin{remark}
+    Pour l'équation KdV adimensionnée sous la forme :
+    $$\partial_t u + \partial_x u + u\partial_x u + \partial_{xxx}^3 u =0$$
+    La démarche précédente fournit l'expression suivante pour le soliton :
+    $$ f(x,t) = 3 (c - 1) \text{sech}^2\Big(\sqrt{c - 1}(x - ct)\Big) $$
+\end{remark}
+\end{remarkbox}
+
+\subsection{Solutions périodiques : ondes cnoïdales}
+
+Un autre type d'onde qui est à la fois solution de l'équation KdV et BBM sont les ondes cnoïdales. Il s'agît d'ondes de gravité de surface (comme les solitons) périodiques dont la longueur d'onde est considérée comme grande devant la profondeur de l'eau. Le terme "cnoïdale" provient du fait que le profil de ce type d'onde est exprimé à l'aide des fonctions elliptiques de Jacobi \footnote{Ensemble de 12 fonctions d'une variable complexe, dépendant d'un paramètre $k\in ]0,1[$, dont les noms sont issus de la composition de quatre sommets d'un rectangle \{s,c,d,n\} du plan complexe : sn, cn, dn...}, que l'on note généralement cn. 
+Le profil de ce type d'onde est caractérisé par des crêtes plus marquées et des creux plus aplatis qu'une fonction sinus classique. L'expression générale est donnée par :
+
+$$\eta(x,t) = \eta_2 + H \text{cn}^2\Bigg( \ 2K(m)\frac{x - ct}{\lambda} \ \Bigg| \ m \ \Bigg)$$
+
+Où $\eta_2$ est la hauteur du creux de la vague, $\lambda$ est la longueur d'onde, $c$ est la vitesse de phase, $H$ est la hauteur de la vague, $m$ est un paramètre elliptique déterminant la forme de la vague (par exemple pour $m=0$ la fonction cn est un cosinus) et cn est une fonction elliptique de Jacobi.
+$K(m)$ désigne l'intégrale elliptique de première espèce, donnée par la formule :
+$$K(m) = \int_{0}^{\frac{\pi}{2}} \frac{d\theta}{\sqrt{1 - m^2\sin^2\theta}}$$
+Nous ne détaillerons pas le calcul du profil de l'onde cnoïdale, cela nécessiterait d'approfondir les concepts d'intégrales elliptiques et de fonctions elliptiques de Jacobi, ce qui sort du cadre de ce sujet.
+Il reste néanmoins intéressant d'évoquer le fait qu'à partir des ondes cnoïdales il est possible de retrouver les ondes solitaires dont nous avons parlé précédemment. 
+En étudiant notamment la dépendance au paramètre $m$ des ondes cnoïdales et en faisant tendre ce dernier vers 1, l'onde périodique devient une onde solitaire (de période infinie). Nous pouvons finalement voir les ondes solitaires comme des ondes cnoïdales dont la période tend vers l'infini.
+
+% \subsection{Solutions périodiques}
+% \subsection{Chocs dispersifs}
+% \section{Propriétés qualitatives : interactions élastiques et collisions}

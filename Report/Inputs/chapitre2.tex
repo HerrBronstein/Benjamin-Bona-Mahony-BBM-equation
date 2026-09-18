@@ -1,0 +1,421 @@
+
+\chapter{Dérivation et justification de l'équation}
+\section{Obtention de l'équation KdV}
+
+Afin de mettre en valeur les avantages de l'équation BBM par rapport à l'équation de Korteweg-de Vries (KdV) et de montrer sa légitimité, on propose de rappeler les principales étapes de la dérivation de l'équation KdV.
+
+La première propriété essentielle des systèmes concernés est que les effets dispersifs sur les ondes infinitésimales disparaissent à la limite lorsque la longueur d’onde tend vers l’infini et la vitesse de phase limite est une constante $c_0 > 0$. On entend par là que dans le régime
+des ondes longues et de faible amplitude, les effets dispersifs s'estompent, permettant à
+toute perturbation de se propager de manière uniforme à cette vitesse constante.
+
+Ainsi, dans le cas des ondes de gravité de faible amplitude et de longueur extrème, la propagation dans le sens $+x$ est décrite par :
+\begin{equation}\label{eq:transport}
+    u^*_{t^*} + c_0 u^*_{x^*} = 0
+\end{equation}
+La solution de cette équation de transport est bien connue et donnée par $u^*(x^*,t^*) = u_0(x^* - c_0 t^*)$, où $u^*_0$ est la condition initiale.
+
+On peut déjà noter que cette équation, bien que simple, possède une certaine validité comme approximation pour des ondes réelles d’amplitude suffisamment faible et de grande longueur. Toutefois, cette approximation n’est plus valable sur de très longues durées, car les effets non linéaires et la dispersion en fréquence peuvent alors s’accumuler et devenir significatifs.
+On propose alors d'introduire des termes de correction pour tenir compte de ces effets. On commence néamoins par négliger leurs interactions en prenant d'abords en compte séparément les effets non linéaires et les effets de dispersion en apportant une correction à l'équation de transport linéaire. Les termes d'ordre supérieur prenant en compte les interactions entre ces effets apparaissent alors négligeables à ce stade de la dérivation.
+
+Commençons par négliger les effets de dispersion modélisons les effets non linéaires sur les ondes se propageant dans la direction $+x^*$. On veut donc prendre en compte la façon dont l'amplitude de la vague modifie sa vitesse, voici comment nous écrivons cela mathématiquement. Alors que dans l'équation \ref{eq:transport}, toutes les valeurs spécifiques de $u^*$ se propagent à la même vitesse $\frac{dx^*}{dt^*} = c_0$ le long des caractéristiques, on décide dans notre nouvelle approximation de rentre la vélocité caractéristique dépendante de $u^*$ comme il suit :
+\begin{equation}
+    \frac{1}{c_0} \frac{dx^*}{dt^*} = 1 + b u^*
+\end{equation}
+
+où $b$ est une constante de proportionnalité qui mesure l'intensité de l'effet non linéaire. En d'autres termes, la vitesse de propagation de la vague n'est plus constante, mais dépend de son amplitude $u^*$, les caractéristiques ne seront alors plus des lignes droites, mais plutôt des courbes dont la pente dépend localement de l'amplitude de la vague. Cette propriété dépend généralement du fait que $|bu^*|$ soit petit, ce qu'on clarifie en écrivant :
+\begin{equation}
+    bu^* = \epsilon U \quad (\epsilon > 0)
+\end{equation}
+en considérant que la variable dépendante mise à l'échelle U est d'un ordre de grandeur unité ce qui signifie que la faible amplitude de l'onde est absorbée dans le paramètre de perturbation $\epsilon$. La validité de cette approximation repose sur le fait que $\epsilon$ soit suffisamment petit $(\epsilon \ll 1)$, ce qui correspond à des ondes de faible amplitude. Dans ce cas l'erreur est de l'ordre de $\epsilon^2$ et devient négligeable à mesure que $\epsilon$ tend vers zéro. On peut alors réécrire l'équation \ref{eq:transport} en tenant compte de cette correction non linéaire :
+\begin{align*}
+    &u^*_{t^*} + (c_0 + b u^* c_0) u^*_{x^*} &= 0 \\
+    \Leftrightarrow \; &u^*_{t^*} + c_0 u^*_{x^*} + b u^* c_0 u^*_{x^*} &= 0 \\
+    \Leftrightarrow \; &\frac{\epsilon}{b} U_{t^*} + c_0 \frac{\epsilon}{b} U_{x^*} + c_0 b \frac{\epsilon^2}{b^2} U U_{x^*} &= 0 \\
+\end{align*}
+On simplifie alors en multipliant par $\frac{b}{\epsilon}$ pour obtenir :
+\begin{equation}
+    U_{t^*} + c_0 U_{x^*} + \epsilon c_0 U U_{x^*} = 0
+\end{equation}
+Cette dernière équation prend en compte les effets non linéaire avec une approximation précise à $O(\epsilon)$ des lois de la mécaniques des fluides.
+
+Nous allons maintenant laisser de coté un instant les effets non linéaires et les négliger afin de nous consentrer sur les effets de dispersion. Pour cela on introduit d'abord la formule de dispersion suivante :
+\begin{equation}
+    \sigma = \kappa c (\kappa)
+\end{equation}
+Ce qu'il faut comprendre ici, c'est que la fréquence de la vague $\sigma$ dépend du nombre d'ondes $\kappa$ et d'une fonction de dispersion $c(\kappa)$ que l'on nomme vitesse de phase. Afin de décrire l'effet de dispersion, nous allons partir de l'onde harmonique suivante :
+\begin{equation*}
+    u^*(x^*,t^*) = a \exp(i \sigma t^* - i \kappa x^*)
+\end{equation*}
+C'est simplement une onde plane de nombre d'ondes $\kappa$ et de fréquence $\sigma$ qui se déplace dans la direction $+x^*$ avec une amplitude $a$. Grâce à la formule de dispersion, on peut réécrire cette onde de la manière suivante :
+\begin{equation*}
+    u^*(x^*,t^*) = a \exp(i \kappa c(\kappa) t^* - i \kappa x^*)
+\end{equation*}
+On va maintenant calculer les dérivées temporelles et spatiales de cette onde pour voir comment elle évolue dans le temps et l'espace. En calculant la dérivée temporelle, on trouve :
+\begin{equation*}
+    u^*_{t^*} = i \kappa c(\kappa) a \exp(i \kappa c(\kappa) t^* - i \kappa x^*)
+\end{equation*}
+En calculant la dérivée spatiale, on trouve :
+\begin{equation*}
+    u^*_{x^*} = -i \kappa a \exp(i \kappa c(\kappa) t^* - i \kappa x^*)
+\end{equation*}
+On remarque alors qu'on a la formule suivante :
+\begin{equation*}
+    u^*_{t^*} + c(\kappa) u^*_{x^*} = 0
+\end{equation*}
+Le problème est qu'une vague réelle est bien plus complexe : selon le principe de Fourier, elle est constituée d'une superposition d'une infinité d'ondes simples ayant chacune un $\kappa$ différent, et donc une vitesse $c(\kappa)$ différente. On ne peut donc plus écrire une équation différentielle simple avec un seul coefficient de vitesse constant devant la dérivée spatiale. On se doit donc d'introduire un opérateur différentiel linéaire $L$ qui va agir sur $u^*$ pour modéliser les effets de dispersion. On aura donc :
+
+\begin{equation}
+    u^*_{t^*} + c_0 (L u^*)_{x^*} = 0
+\end{equation}
+
+On utilise la transformée de Fourier pour définir cet opérateur de la manière suivante :
+
+\begin{equation}
+    Lu^* = \frac{1}{2\pi} \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} \frac{c(\kappa)}{c_0} e^{i\kappa(x^* - \xi)} u^*(\xi, t^*) d\xi \, d\kappa.
+\end{equation}
+
+Cette équation résulte d'une application de la transformée de Fourier et de sa transformée inverse pour exprimer la relation entre la fonction $u^*$ et sa représentation dans l'espace de Fourier. Pour obtenir cette formule, on applique d'abord la transformée de Fourier à $u^*(x^*,t^*)$.
+
+\begin{equation*}
+    \widehat{u^*}(\kappa,t^*) = \int_{-\infty}^{\infty} u^*(\xi,t^*) e^{-i\kappa \xi} d\xi
+\end{equation*}
+
+Ici pour prendre en compte les effets de dispersion, on multiplie la transformée de Fourier de $u^*$ par le facteur de dispersion $\frac{c(\kappa)}{c_0}$, car chaque onde de fréquence $\kappa$ se propage à une vitesse différente $c(\kappa)$. On obtient alors :
+
+\begin{equation*}
+    \widehat{u^*}(\kappa,t^*) = \int_{-\infty}^{\infty} \frac{c(\kappa)}{c_0} u^*(\xi,t^*) e^{-i\kappa \xi} d\xi
+\end{equation*}
+
+On a plus qu'a appliquer la transformée de Fourier inverse pour revenir à l'espace physique et obtenir l'expression de $Lu^*$ :
+
+\begin{equation*}
+    Lu^* = \frac{1}{2\pi} \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} \frac{c(\kappa)}{c_0} e^{i\kappa(x^* - \xi)} u^*(\xi, t^*) d\xi \, d\kappa.
+\end{equation*}
+
+Ce résultat étant trop lourd pour pouvoir être utilisé tel quel, on va plutôt chercher une approximation plus simple de cet opérateur de dispersion. Dans notre cas, l'environnement physique obéit aux lois exactes de la mécanique des fluides, la formule de la vitesse de dispersion $c(\kappa)$ est donc bien connue comme par exemple dans le cas des vagues à la surface de l'eau en profondeur $h$ qui donne $c(\kappa) = c_0 \left( \frac{\tanh(\kappa h)}{kh}\right)^{\frac{1}{2}}$. De ces résultats on obtient que $c(\kappa)$ atteint un maximum parfaitement lisse avec une courbure non nulle quand $\kappa=0$ (pour les ondes infiniment longues). Grâce à ce comportement physique, on peut faire une approximation parabolique de la fonction de dispersion $c(\kappa)$ pour les petites valeurs de $\kappa$ avec un développement de Taylor à l'ordre 2 autour de $\kappa=0$ :
+
+\begin{equation}
+    c(\kappa) = c_0 ( 1 - \alpha \kappa^2 )
+\end{equation}
+
+Avec :
+
+\begin{equation*}
+    c_0 \alpha^2 = -\frac{1}{2} c''(0) > 0
+\end{equation*}
+
+Ici on fait face à un problème. D'un coté la non-linéarité dépend comme vu plus haut d'un paramètre $\epsilon$ et d'un autre la dispersion dépend d'un paramètre $\kappa^2$. Cependant pour qu'une vague se propage sur une longue distance sans se déformer, il faut obligatoirement que les effets de non linéarité et de dispersion soient liés, c'est à dire que $\epsilon$ et $\kappa^2$ soient du même ordre de grandeur. On introduit donc deux nouvelle variables que nous mettons à l'échelle :
+
+\begin{equation*}
+    X = \epsilon^{\frac{1}{2}} x, \quad T = \epsilon^{\frac{1}{2}} t c_0
+\end{equation*}
+
+Nous cherchons à ce que $\kappa^2$ soit de l'ordre de $\epsilon$, donc que $\kappa$ soit de l'ordre de $\epsilon^{\frac{1}{2}}$. Mais comme $\kappa$ est défini comme l'inverse d'une distance, si $\kappa$ est de l'ordre de $\epsilon^{\frac{1}{2}}$, alors la distance doit être de l'ordre de $\epsilon^{-\frac{1}{2}}$. C'est pour cela que nous introduisons la variable $X$ qui est une mise à l'échelle de la variable spatiale $x$ par un facteur de $\epsilon^{\frac{1}{2}}$. De même, pour que les effets de non linéarité et de dispersion soient liés, il faut que le temps soit également mis à l'échelle par un facteur de $\epsilon^{\frac{1}{2}}$, d'où l'introduction de la variable $T$. Cette nouvelle échelle va ensuite être appliqué à $u^* = \frac{\epsilon}{b} U(X,T)$ donne :
+
+\begin{equation}
+    U_T + (L_\epsilon U)_X = 0
+    \label{eq:1}
+\end{equation}
+
+Ici on peut appliquer Fourier avec les variables mises à l'échelle et $K = \epsilon^{-\frac{1}{2}} \kappa$ pour trouver l'expression de $L_\epsilon U$ :
+
+\begin{equation*}
+    L_\epsilon U = \frac{1}{2\pi} \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} \frac{c(\epsilon^{\frac{1}{2}} K)}{c_0} e^{iK(X - \Xi)} U(\Xi, T) d\Xi \, dK
+\end{equation*}
+
+La mise à l'échelle et le caractère physique de l'onde nous permettent d'affirmer que les dérivées par rapport à $X$ de $U(X,T)$ sont du même odre de grandeur que $U$. On peut également supposer qu'elles sont de carré intégrable sur $(-\infty, \infty)$ et donc qu'on peut appliquer la transformée de Fourier. Si la fonction paire $c(\epsilon^{\frac{1}{2}} K)/c_0$ est développable en série de Maclaurin, c'est à dire que le fluide est assez régulier, alors nous pouvons écrire :
+
+\begin{equation*}
+    \frac{c(\epsilon^{\frac{1}{2}} K)}{c_0} = 1 + \sum_{n=1}^{\infty} A_n \epsilon^n K^{2n} \quad (A_1 = -\alpha^2)
+\end{equation*}
+
+qui est une série absolument convergente pour tout $\epsilon^{\frac{1}{2}} K$, et ainsi nous pouvons exprimer $L_\epsilon U$ comme une série de dérivées de $U$ :
+
+\begin{equation*}
+    L_\epsilon U = U + \sum_{n=1}^{\infty} (-1)^n A_n \epsilon^n \frac{\partial^{2n} U}{\partial X^{2n}}
+\end{equation*}
+
+Ce résultat s'obtient comme ceci :
+
+\begin{align*}
+    L_\epsilon U &= \frac{1}{2\pi} \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} \frac{c(\epsilon^{\frac{1}{2}} K)}{c_0} e^{iK(X - \Xi)} U(\Xi, T) d\Xi \, dK\\
+    &= \frac{1}{2\pi} \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} \left( 1 + \sum_{n=1}^{\infty} A_n \epsilon^n K^{2n} \right)e^{iK(X - \Xi)} U(\Xi, T) d\Xi \, dK\\
+    &= \frac{1}{2\pi} \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} e^{iK(X - \Xi)} U(\Xi, T) d\Xi \, dK + \sum_{n=1}^{\infty} A_n \epsilon^n \frac{1}{2\pi} \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} K^{2n} e^{iK(X - \Xi)} U(\Xi, T) d\Xi \, dK
+\end{align*}
+
+Dans le terme de gauche, nous reconnaissons la formule de la transformée de Fourier inverse qui nous donne $U(X,T)$. Pour le terme de droite, il suffit de remarquer que :
+
+\begin{align*}
+    \frac{1}{2\pi} \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} K^{2n} e^{iK(X - \Xi)} U(\Xi, T) d\Xi \, dK &= \frac{1}{2\pi} \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} (-1)^n(iK)^{2n} e^{iK(X - \Xi)} U(\Xi, T) d\Xi \, dK\\
+    &= \frac{\partial^{2n}}{\partial X^{2n}} \frac{1}{2\pi} \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} (-1)^ne^{iK(X - \Xi)} U(\Xi, T) d\Xi \, dK\\
+    &= \frac{\partial^{2n}}{\partial X^{2n}} (-1)^n U(X,T)
+\end{align*}
+
+En multipliant par $A_n \epsilon^n$ on retrouve bien l'expression de $L_\epsilon U$. Grâce à l'absolue convergence de la série de Maclaurin plus haut et aux hypothèses sur les dérivées de $U$, nous pouvons considérer que cette aproximation de $L_\epsilon U$ convergera rapidement pour $\epsilon << 1$. En tronquant au premier ordre de $\epsilon$, nous nous retrouvons avec l'aproximation suivante :
+
+\begin{equation*}
+    L_\epsilon U = U + \epsilon \alpha^2 U_{XX}
+\end{equation*}
+
+Et donc l'équation \eqref{eq:1} devient :
+
+\begin{equation}
+    U_T + U_X + \epsilon \alpha^2 U_{XXX} = 0
+\end{equation}
+
+Que nous pouvons considérer comme étant l'amélioration de l'équation de transport \eqref{eq:transport} en tenant compte des effets de dispersion.
+
+
+
+
+
+
+
+
+
+
+
+
+
+Pour valider de manière rigoureuse la troncature effectuée à l'ordre $O(\epsilon)$, il convient d'analyser précisément le comportement du terme résiduel négligé. Définissons le reste $\Delta U$ issu de l'approximation de l'opérateur de dispersion $L_\epsilon U$ par l'expression suivante :
+
+\[
+    \Delta U = L_\epsilon U - U - \epsilon \alpha^2 U_{XX}
+\]
+
+L'objectif est de démontrer que la contribution de ce reste dans l'équation de transport, à savoir la dérivée spatiale $(\Delta U)_X$ est d'ordre $O(\epsilon^2)$, ce qui la rend formellement insignifiante devant les termes de premier ordre lorsque le paramètre d'amplitude $\epsilon$ devient suffisamment petit $(\epsilon \ll 1)$. En reprenant la définition de l'opérateur linéaire par transformée de Fourier, le reste s'exprime sous la forme intégrale :
+
+\[
+    \Delta U(X,T) = \frac{1}{2\pi} \int_{-\infty}^{\infty} \gamma(\epsilon^\frac{1}{2}K)\epsilon^{iKX}\hat{U}(K,T)dK
+\]
+
+Ici, $\hat{U}(K,T)$ représente la tranformée de Fourier de la fonction mise à l'échelle $U(X,T)$ par rapport à la variable spatiale $X$, et la fonction d'erreur de dispersion $\gamma(k)$ est définie par :
+
+\[
+    \gamma(k) = \frac{c(k)}{c_0} -1 + \alpha^2 \kappa^2
+\]
+
+
+En dérivant l'expression du reste par rapport à $X$, le contrôle de l'erreur maximale absolue nécessite l'application conjointe de deux outils d'analyse fonctionnelle. Commençons par rappeler formellement ces deux théorèmes :
+
+\begin{theorembox}
+\begin{theorem}[Inégalité d'injection de Sobolev en dimension 1]
+Soit $u \in H^1(\mathbb{R})$, l'espace des fonctions de carré intégrable dont la dérivée première au sens des distributions est également de carré intégrable. Alors $u$ s'injecte de manière continue dans l'espace $C_b(\mathbb{R})$ des fonctions continues et bornées sur $\mathbb{R}$. L'inégalité associée, permettant de majorer uniformément une fonction par sa norme globale, s'écrit :
+\[
+\sup_{x \in \mathbb{R}} |u(x)| \le \|u\|_{H^1(\mathbb{R})} = \left( \int_{-\infty}^{\infty} \left( |u(x)|^2 + |u'(x)|^2 \right) dx \right)^{\frac{1}{2}}
+\]
+\end{theorem}
+\end{theorembox}
+
+\begin{theorembox}
+\begin{theorem}[Théorème de Parseval]
+Soit $f \in L^2(\mathbb{R})$ une fonction de carré intégrable et $\hat{f}$ sa transformée de Fourier. Avec la convention de normalisation où le facteur $\frac{1}{2\pi}$ est placé devant l'intégrale inverse, l'isométrie entre l'espace physique et l'espace spectral s'exprime par l'égalité suivante :
+\[
+\int_{-\infty}^{\infty} |f(x)|^2 dx = \frac{1}{2\pi} \int_{-\infty}^{\infty} |\hat{f}(K)|^2 dK
+\]
+\end{theorem}
+\end{theorembox}
+Pour évaluer la borne supérieure uniforme (\textit{supremum}) de la dérivée du reste, notée $(\Delta U)_X$, nous appliquons dans un premier temps l'inégalité d'injection de Sobolev en posant $u(X) = (\Delta U)_X$. Étant donné que $u'(X) = (\Delta U)_{XX}$, la borne supérieure est contrôlée par la norme $L^2$ de la fonction et de sa dérivée :
+\begin{equation}
+\sup_{-\infty<X<\infty}|(\Delta U)_{X}| \le \left( \int_{-\infty}^{\infty} \left( |(\Delta U)_X|^2 + |(\Delta U)_{XX}|^2 \right) dX \right)^{\frac{1}{2}}
+\end{equation}
+
+Dans un second temps, nous transformons cette intégrale de l'espace physique vers l'espace des fréquences en appliquant le théorème de Parseval à chacun des deux termes sous la racine. Rappelons que l'opération de dérivation dans l'espace direct se traduit par une multiplication par $(iK)$ dans l'espace spectral, ce qui donne pour les transformées de Fourier :
+\[
+\widehat{(\Delta U)_X}(K) = iK \widehat{\Delta U}(K) \quad \text{et} \quad \widehat{(\Delta U)_{XX}}(K) = -K^2 \widehat{\Delta U}(K)
+\]
+En élevant ces modules au carré, nous faisons apparaître les puissances paires du nombre d'ondes $K$ :
+\[
+|\widehat{(\Delta U)_X}(K)|^2 = K^2 |\widehat{\Delta U}(K)|^2 \quad \text{et} \quad |\widehat{(\Delta U)_{XX}}(K)|^2 = K^4 |\widehat{\Delta U}(K)|^2
+\]
+En sommant ces deux contributions spectrales sous l'opérateur intégral de Parseval, nous pouvons factoriser par $K^2$, ce qui justifie la première borne supérieure recherchée :
+\begin{align*}
+\sup_{-\infty<X<\infty}|(\Delta U)_{X}| &\le \left\{\frac{1}{2\pi}\int_{-\infty}^{\infty}(K^2+K^4)|\hat{\Delta U}(K,T)|^{2}dK\right\}^{\frac{1}{2}} \\
+&= \left\{\frac{1}{2\pi}\int_{-\infty}^{\infty}(1+K^{2})K^{2}|\hat{\Delta U}(K,T)|^{2}dK\right\}^{\frac{1}{2}}
+\end{align*}
+
+Enfin, pour lier directement cette estimation à la fonction d'onde principale $U$, nous utilisons la définition sous forme d'intégrale de Fourier du reste établie précédemment. Par unicité de la transformée de Fourier, il apparaît immédiatement que la composante spectrale du reste s'identifie au produit de la fonction d'erreur de dispersion $\gamma$ et de la transformée de la solution mise à l'échelle :
+\[
+\widehat{\Delta U}(K,T) = \gamma(\epsilon^{\frac{1}{2}}K)\hat{U}(K,T)
+\]
+En injectant le carré de ce module $|\widehat{\Delta U}(K,T)|^2 = \gamma^2(\epsilon^{\frac{1}{2}}K)|\hat{U}(K,T)|^2$ dans notre inégalité, nous obtenons l'expression finale exacte permettant d'isoler le comportement de l'erreur de troncature :
+\begin{equation}
+\sup_{-\infty<X<\infty}|(\Delta U)_{X}| \le \left\{\frac{1}{2\pi}\int_{-\infty}^{\infty}\gamma^{2}(\epsilon^{\frac{1}{2}}K)(K^{2}+K^{4})|\hat{U}(K,T)|^{2}dK\right\}^{\frac{1}{2}}
+\end{equation}
+
+
+
+Dans les exemples de systèmes physiques réels, la vitesse de phase $c(\kappa)$ est une fonction positive décroissante de façon monotone avec l'augmentation du nombre d'ondes $\kappa$. Grâce au comportement parfaitement lisse de cette fonction au voisinage de l'origine ($\kappa = 0$), il est possible de trouver une constante finie $B > 0$ telle que $|\gamma(\kappa)| \le B\kappa^{4}$ pour tout $\kappa$. En effectuant le changement de variable lié à notre mise à l'échelle ($\kappa = \epsilon^{1/2}K$), nous obtenons la majoration locale $\gamma^2(\epsilon^{1/2}K) \le B^2 \epsilon^4 K^8$.
+
+En réinjectant cette borne supérieure dans notre estimation du supremum, le paramètre perturbatif $\epsilon^2$ s'extrait naturellement de l'opérateur intégral :
+\[
+\sup_{-\infty<X<\infty}|(\Delta U)_{X}| \le \epsilon^{2}B\left\{\frac{1}{2\pi}\int_{-\infty}^{\infty}(K^{10}+K^{12})|\hat{U}(K,T)|^{2}dK\right\}^{\frac{1}{2}}
+\]
+
+Enfin, l'application inverse du théorème de Parseval permet de repasser dans l'espace physique afin d'exprimer directement cette borne en fonction des dérivées de la solution :
+\[
+\sup_{-\infty<X<\infty}|(\Delta U)_{X}| \le \epsilon^{2}B\left\{\int_{-\infty}^{\infty}\left[\left(\frac{\partial^5 U}{\partial X^5}\right)^2 + \left(\frac{\partial^6 U}{\partial X^6}\right)^2\right]dX\right\}^{\frac{1}{2}}
+\]
+
+Cette analyse asymptotique met en évidence une condition de régularité mathématique fondamentale : pour que la troncature au premier ordre soit formellement valide, il suffit que la cinquième et la sixième dérivée spatiale de la fonction d'onde (notées $U_{5X}$ et $U_{6X}$) soient toutes deux de carré intégrable sur $\mathbb{R}$. Sous cette condition de régularité (qui implique que $U_{5X}$ reste bornée), l'erreur maximale commise sur l'ensemble du domaine est strictement contrôlée par un ordre de grandeur en $\mathcal{O}(\epsilon^2)$, justifiant pleinement le fait de négliger ce reste face aux corrections en $\mathcal{O}(\epsilon)$.
+
+
+
+
+
+
+
+
+Maintenant que nous avons établi notre approximation au premier ordre tenant compte respectivement des effets de non linéarité et de dispersion, nous pouvons conclure, de façon justifiée, qu'une approximation qui tienne compte à la fois de ces deux effets serait donnée en combinant les deux termes. En passant à l'échelle $X, T$ nous trouvons ainsi :
+
+\begin{equation}\label{eq:KDV_XY}
+    U_T + U_X + \epsilon U U_X + \epsilon \alpha^2 U_{XXX} = 0
+\end{equation}
+
+Nous introduisons alors de nouvelles variables ($x, t, u$) sans le paramètre $\epsilon$, mais qui incluent la constante $\alpha$ liée aux propriétés dispersives du milieu :
+
+\begin{equation}
+    x = \frac{\epsilon^{-1/2}X}{\alpha} = \frac{x^*}{\alpha}, \quad t = \frac{\epsilon^{-1/2}T}{\alpha} = \frac{c_0 t^*}{\alpha}, \quad u = \epsilon U = b u^*
+\end{equation}
+
+Appliquer cette substitution à l'équation approchée obtenue précédemment permet de retrouver l'une des formes classique et épurées de l'équation de Korteweg-de Vries (KdV) adimensionnée :
+
+\begin{equation}\label{eq:KDV}
+    u_t + u_x + u u_x + u_{xxx} = 0
+\end{equation}
+
+
+
+
+\section{Transition vers BBM}
+
+La démarche de Benjamin, Bona et Mahony repose sur une observation cruciale : au premier ordre de précision, l'équation de KDV \eqref{eq:KDV} admet une formulation altérnative équivalente.
+
+Revenons à l'équation \eqref{eq:KDV_XY} avant l'introduction des variables adimensionnelles. Lorsque $\epsilon=0$ la dynamique des ondes longues est entièrement régie par une simple équation de transport linéaire :
+
+\begin{equation}
+    U_T + U_X = 0
+\end{equation}
+
+Cette approximation implique directement que les variables spatiales et temporelles se compensent parfaitement et donne donc $U_X = -U_T$. En dérivant deux fois par rapport à $X$ on obtient directement $U_{XXX} = -U_{XXT}$.
+Par conséquent, au premier ordre d'aproximation en $\epsilon$, il est tout à fait légitime de remplacer le terme dispersif spatial $\epsilon \alpha U_{XXX}$ par un terme croisé $-\epsilon \alpha^2 U_{XXT}$. L'erreur introduite par cette substition est d'odre $O(\epsilon^2)$ ce qui signifie qu'elle est reléguée au même rang que les autres termes résiduels déjà traités précedement. Cette substitution conduit à l'équation alternative mise à l'échelle :
+
+\begin{equation}
+    U_T + U_X + \epsilon(UU_X - \alpha^2 U_{XXT}) = 0
+\end{equation}
+
+En appliquant le même chagement de varaible que précedmeent, on obtient la forme classique et épurée de l'équation régularisée des ondes longues de BBM :
+
+\begin{equation}\label{eq:BBM}
+    u_t + u_x + uu_x - u_{xxt} = 0
+\end{equation}
+
+
+
+
+
+
+
+
+\section{Relation de dispersion des équations linéarisées}
+
+Afin d'étudier la façon dont les différents modèles réagissent à la dispersion pure, nous linéarisons les équations. Cela revient à négliger temporairement les effets non linéaires d'amplitude en posant la condition d'approximation $u\partial_xu \approx 0$.
+
+Reprenons l'équation de Benjamin-Bona-Mahony linéarisée sous sa forme adimensionelle classique :
+
+\begin{equation}
+    \partial_t u + \partial_x u - \partial^3_{txx} u = 0
+\end{equation}
+
+Nous cherchons une solution sous la forme d'une onde harmonique simple :
+
+\begin{equation}
+    u(x,t) = F(k) e^{i(\omega t - kx)}
+\end{equation}
+
+En calculant les dérivées partielles successives de cette expression, les opérateurs différentiels se transforment en termes algébriques :
+
+\begin{align*}
+    \partial_t &= i \omega u (x,t)\\
+    \partial_x u &= -iku(x,t) \\
+    \partial^3_{xxt} u &= i\omega (-ik)^2 u(x,t) = -i \omega k^2 u(x,t) 
+\end{align*}
+
+Nous injectons ces expressions dans l'équation linéairisé et nous factorisons par le terme commun $iu(x,t)$ :
+
+\begin{align*}
+    &i \omega u(x,t) -iku(x,t) + i \omega k^2 u(x,t) = 0\\
+    &\Leftrightarrow i u(x,t) ( \omega - k + k^2 \omega) = 0
+\end{align*}
+
+Pour obtenir une solution non triviale, le facteur entre parenthèses doit s'annuler identiquement :
+
+\begin{align*}
+    \omega (1 + k^2) = k\\
+    \omega_{BBM} (k) = \frac{k}{1 + k^2}
+\end{align*}
+
+Cette relation de dispersion fondamentale nous permet de déterminer explicitement les lois d'évolution des vitesses de phases et de groupe pour le modèle BBM. Pour rappel la vitesse de phase est donnée par $c(k) = \frac{\omega}{k}$ et correspond à la vitesse à laquelle se déplace la forme de l'onde et la vitesse de groupe donnée par $c_g(k) = \frac{d\omega}{dk}$ correspond à la vitesse à laquelle se déplace l'énergie. Ici la vitesse de phase s'écrit :
+
+\begin{equation*}
+    c_{BBM}(k) = \frac{1}{1+k^2}
+\end{equation*}
+
+ Et la vitesse de groupe :
+
+\begin{equation*}
+c_{g,BBM} = \frac{d}{dk} \left( \frac{k}{1+k^2}\right) = \frac{1 - k^2}{(1 + k^2)^2}
+\end{equation*}
+
+ Mainenant, afin de pouvoir comparer les deux équations, nous effectuons la démarche analogue pour l'équation de Korteweg-de Vries linéarisée :
+
+ \begin{equation}
+     \partial_t u + \partial_x u + \partial^3_{xxx} u = 0
+ \end{equation}
+
+En injectant la même forme d'onde d'essai $u(x,t) = F(k)e^{i(\omega t - kx)}$, la dérivée troisième spatiale se transforme selon la relation :
+
+\begin{equation*}
+    \partial^3_{xxx} u = (-ik)^3u(x,t) = ik^3u(x,t)
+\end{equation*}
+
+L'équation algébrique résultante s'écrit alors : 
+\begin{align*}
+    &i \omega u (x,t) - ik u(x,t) + i k^3 u(x,t) = 0 \\
+    &\Leftrightarrow iu(x,t)(\omega - k + k^3) = 0
+\end{align*}
+
+Ce qui permet d'isoler la relation de dispersion de l'équation KdV :
+
+\begin{equation*}
+    \omega_{KdV}(k) = k - k^3
+\end{equation*}
+
+On en déduit les expressions des vitesses associées à ce modèle : 
+
+\begin{align*}
+    c_{KdV}(k) = 1 - k^2\\
+    c_{g,KdV} = 1 - 3k^2
+\end{align*}
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Comparaison des modèles}
+
+Les relations de dispersion établies à la section précédente nous fournissent le critère décisif pour comparer la pertinence physique et mathématique des deux équations. Puisque ces modèles ont été dérivés sous l'hypothèse d'ondes longues, soit de $k$ petit, ils offrent des prédictions équivalentes dans ce régime. La divergence fondamentale entre KdV et BBM se manifeste lorsqu'on observe leurs comportements respectifs face aux ondes courtes, soit lorque $k \gg 1$.
+
+L'analyse des vitesses pour le modèle de KdV révèle un comportement insatisfaisant à haute fréquence. D'une part, la vitesse de phase $c_{KdV}(k) = 1 - k^2$ devient strictement négative dès que $k > 1$. Cela contredit l'hypothèse initiale selon laquelle, les ondes éudiées se propagent de manière unidirectionnelle dans le sens $+x$. Aussi, la vitesse de groupe $c_{g,KdV}(k) = 1 - 3k^2$ ne possède aucune borne inférieure. Lorsque $k \to \infty$, l'énergie associée aux ondes courtes se propage vers l'arrière à une vitesse tendant vers l'infini. Sur le plan pratique, cela signifie qu'une condition initiale comportant de brusques variations ou une simple erreur d'arrondi numérique va générer des oscillations artificielles se propageant instantanément dans tous les domaines.
+
+L'équation de Benjamin-Bona-Mahony quand à elle corrige ces défauts grâce à la substitution du terme dispersif. En observant les vitesses d'onde et de groupe de l'équation BBM, nous constatons que celles-ci sont parfaitement bornées pour tout $k \in \mathbb{R}$. Surtout, lorsque le nombre d'ondes devient très grand, soit $k \to \infty$ ces deux vitesses tendent asymptotiquement vers 0. Physiquement, cela signifie que les ondes très courtes ne se propagent pas, elles restent confinées localement. Le modèle BBM répond donc faiblement aux composantes à courte longueur d'onde ce qui prévient l'apparition d'instabilités. 
+
+
