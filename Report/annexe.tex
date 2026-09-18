@@ -1,0 +1,478 @@
+\appendix
+\chapter{Remarques sur les espaces fonctionnels utilisés}
+
+Dans le chapitre 3 nous avons définit deux espaces fonctionnels :
+
+\begin{itemize}
+    \item $\mathcal{C}_T = \Big\{ u \in \mathcal{C}^0(\R \times [0,T]) \ | \ \exists k > 0, \ \forall (x,t) \in \R \times [0,T], \ |u(x,t)| \leq k \Big\}$
+    \item $\mathcal{C}^{l,m}_T =  \Big\{ u \in D^{l,m}(\R \times [0,T]) \ | \ \partial_x^i \partial_t^j u \in \mathcal{C}_T, \ \forall (i,j) \in \llbracket 0,l \rrbracket \times \llbracket 0,m \rrbracket \Big\}$
+\end{itemize}
+Où on note ici $D^{l,m}(\Omega)$ l'ensemble des fonctions $l$ dérivables suivant leur premier argument et $m$ fois selon leur second.
+\vspace{1em}
+
+Respectivement munis des normes :
+$$\|u\|_{\mathcal{C}_T} = \underset{(x,t)\in \R \times [0,T]}{\sup}|u(x,t)| \ \text{ et } \ \| u \|_{\mathcal{C}^{l,m}_T} = \sum_{i=0}^{l} \sum_{j=0}^{m} \| \partial_x^i \partial_t^j u \|_{\mathcal{C}_T} $$
+
+Ces espaces munis de cette structure sont des espaces de Banach. 
+
+\begin{proof}
+    Démontrons que $\mathcal{C}_T$ est complet. 
+
+    Soit $(u_n)_{n\in \N} \subset \mathcal{C}_T$ une suite de Cauchy pour $\| \cdot \|_{\mathcal{C}_T}$ et soit $\epsilon >0$. 
+    Il existe un rang $N \in \N$ tel que pour tout $p,q \geq N$, $\|u_p - u_q\|_{\mathcal{C}_T} \leq \epsilon$
+
+    Pour $(x,t)\in \R\times [0,T]$ nous avons :
+    $$|u_p(x,t) - u_q(x,t)| \leq \|u_p - u_q\|_{\mathcal{C}_T} \leq \epsilon$$
+
+    Alors la suite $\big(u_n(x,t)\big)_n$ est de Cauchy dans $\R$. Par complétude de $\R$, il existe $u(x,t)\in \R$ tel que $u_n(x,t) \xrightarrow[n \to +\infty]{}u(x,t)$.
+
+    Par passage à la limite suivant $q$ dans la première inégalité puis au sup, nous obtenons :
+    $$\| u_p - u \|_{\mathcal{C}_T} \leq \epsilon$$
+    Il existe donc une fonction $u$ telle que $u_n \xrightarrow{\mathcal{C}_T} u $.
+    Nous montrons ensuite que $u \in \mathcal{C}_T$. 
+    D'une part, $u$ est uniformément bornée :
+
+    Pour $(x,t)\in \R \times [0,T]$,
+    $$|u(x,t)| \leq |u_n(x,t)| + |u(x,t) - u_n(x,t)| \leq \|u_n\|_{\mathcal{C}_T} + C$$
+    
+    Puis $u$ est continue :
+    \begin{equation*}
+    \begin{split}
+        |u(x,t) - u(\xi,\tau)| &\leq |u(x,t) - u_n(x,t)| + |u_n(x,t) - u_n(\xi,\tau)| + |u_n(\xi,\tau) - u(\xi,\tau)| \\
+        &\leq 2\| u - u_n \|_{\mathcal{C}_T} + |u_n(x,t) - u_n(\xi,\tau)|
+    \end{split}
+    \end{equation*}
+    Soit $\epsilon > 0$, par continuité de $u_n$, il existe $\delta > 0$ tel que pour $|x- \xi| \leq \delta$ et $|t - \tau| \leq \delta$, 
+    
+    $|u_n(x,t) - u_n(\xi,\tau)| \leq \frac{\epsilon}{3}$
+
+    Puis il existe un rang $M \in \N$ tel que pour $n \geq M$, $\|u_n - u\|_{\mathcal{C}_T} \leq \frac{\epsilon}{3}$
+
+    Et finalement pour $|x - \xi|,|t - \tau| \leq \delta$ et $n \geq M$ :
+    $$|u(x,t) - u(\xi,\tau)| \leq \epsilon$$
+
+\end{proof}
+
+Rappelons la définition des espaces de Sobolev, que nous utiliseront dans la prochaine partie des annexes :
+Soit $\Omega \subset \R^d$ un ouvert,
+$$W^{n,p}(\Omega) = \Big\{ u \in L^p(\Omega) \ \big| \ \partial^{\alpha}u \in L^p(\Omega), \ \forall \alpha \in \N^d, \ |\alpha| = \alpha_1 + \dots + \alpha_d = n \Big\}$$
+Où $\partial^{\alpha} = \frac{\partial^{|\alpha|}}{\partial x_1^{\alpha_1} \dots \partial x_d^{\alpha_d}} $.
+
+La définition vient avec la norme suivante :
+$$\|u\|_{W^{n,p}} = \bigg( \sum_{| \alpha | \leq n} \| \partial^{\alpha} u \|_{L^p}^p \bigg)^{\frac{1}{p}} $$
+Nous rappelons la définition $H^n(\Omega) := W^{n,2}(\Omega)$.
+De même, afin d'écarter toute possibilité d'ambiguité, nous posons $\mathcal{D}(\Omega) = C^{\infty}_c(\Omega)$ l'ensemble des fonctions contiûement dérivables une infinité de fois et à support compact.
+Nous utiliserons cette définition dans la prochaine annexe.
+\vspace{1em}
+
+Nous avons affirmé que la condition $u \in H^1(\R) \cap \mathcal{C}^2(\R)$ impliquait que $u$ et $\partial_x u$ étaient asymptotiquement nulles.
+
+Pour démontrer cela, nous allons nous appuyer sur un résultat plus général :
+\begin{lemmabox}
+\begin{lemma}
+    Si $u \in L^2(\R) \cap \mathcal{C}^1(\R)$, alors $u$ est asymptotiquement nulle.
+\end{lemma}
+\end{lemmabox}
+
+\begin{proof}
+
+    \vspace{1em}
+
+    Raisonnons par l'absurde et supposons que $u$ n'est pas asymptotiquement nulle.
+    Alors il existe $\epsilon > 0$ et $(a_n)_{n \in \N} \subset \R$ tels que $a_n \xrightarrow[n \to +\infty]{} + \infty$ et $|u(a_n)|>\epsilon$.
+
+    Nous pouvons supposer, sans perdre de généralités que la suite $(a_n)_n$ est strictement croissante et que $(u(a_n))_n$ est de signe constant.
+
+    Nous supposons également que pour tout $n \in \N$ il existe $\xi_n \in [a_n,a_{n+1}]$ tel que $u(\xi_n) \leq \frac{1}{2}\epsilon$.
+    Cela est possible car $u \in L^2(\R)$ et que $u \geq \frac{1}{2}\epsilon$ n'est possible que sur un ensemble de mesure finie.
+
+    \vspace{1em}
+    Par continuité de $u$, nous pouvons définir $b_n$ la première valeur inférieure à $a_n$ telle que $u(b_n) = \frac{1}{2}\epsilon$ et
+    $c_n$ la première valeur plus grande que $a_n$ telle que $u(c_n) = \frac{1}{2}\epsilon$. 
+    
+    Nous définissons ainsi la suite d'ensembles $I_n = ]b_n,c_n[$.
+    $(I_n)_n$ est une suite d'ensembles deux à deux disjoints, non vides et ouverts. De cette façon nous avons $\forall \xi \in I_n, \ u(\xi) \geq \frac{1}{2}\epsilon$ et $u_{|\partial I_n} = \frac{1}{2}\epsilon$.
+    
+    Puisque $u \in L^2(\R)$, alors $\mu(I_n) = c_n - b_n \xrightarrow[n \to +\infty]{}0$.
+
+    \vspace{1em}
+    Par le théorème des accroissements finis il existe $\sigma_n \in ]b_n,a_n[$ et $\tau_n \in ]a_n, c_n[$ tels que :
+
+    $$ u'(\sigma_n) = \frac{u(a_n) - u(b_n)}{a_n - b_n} \ \text{ et } \ u'(\tau_n) = \frac{u(c_n) - u(a_n)}{c_n - a_n} $$
+
+    Or $|u(a_n)|>\epsilon$, $u(b_n) = \frac{1}{2}\epsilon$ et $u(c_n) = \frac{1}{2}\epsilon$.
+    Ce qui donne :
+
+    $$|u'(\sigma_n)| \geq \frac{\epsilon}{2(a_n - b_n)} \ \text{ et } \ |u'(\tau_n)| \geq \frac{\epsilon}{2(c_n - a_n)} $$
+    
+    Et l'un des côtés droit de ces deux inégalités doit au moins être plus grand que $\frac{\epsilon}{4(c_n - b_n)}$.
+
+    Ainsi il existe un point $\lambda_n \in ]b_n,c_n[$ tel que :
+    $$|u'(\lambda_n)| > \frac{\epsilon}{4(c_n - b_n)}$$.
+
+    Mais le fait que $(c_n - b_n) \xrightarrow[n \to +\infty]{}0$ vient contredire le fait que $u'$ soit bornée.
+    Dans ce cas, $u$ ne peut pas être asymptotiquement nulle.
+
+\end{proof}
+
+Nous remarquons que ce simple lemme suffit à démontrer cette affirmation. En effet, prenons $u \in H^1(\R)\cap\mathcal{C}^2(\R)$.
+Alors puisque $H^1(\R) \subset L^2(\R)$ et $\mathcal{C}^2(\R) \subset \mathcal{C}^1(\R)$, $H^1(\R)\cap\mathcal{C}^2(\R) \subset L^2(\R) \cap \mathcal{C}^1(\R)$ et par le lemme $u$ est asymptotiquement nulle.
+Maintenant par définition de $H^1(\R)$, nous avons $\partial_x u \in L^2(\R)$ et puisque $u \in \mathcal{C}^2(\R)$, alors $\partial_x u \in \mathcal{C}^1(\R)$. De nouveau $\partial_x u$ vérifie les hypothèses du lemme et nous avons bien ce que nous souhaitions démontrer.
+
+\vspace{1em}
+
+Nous avons également fait une autre affirmation concernant l'espace $H^1(\R)$ : En dimension 1, nous avons l'inclusion $H^1(\R) \subset \mathcal{C}^0(\R)$.
+
+Pour montrer cela, nous allons montrer qu'en réalité $H^1(\R)$ est inclu dans l'espace des fonctions lipschitzienne, ce qui est plus fort encore que ce qui était annoncé.
+Prenons $u \in H^1(\R)$ et $x,y \in \R$.
+\begin{equation*}
+\begin{split}
+    |u(x) - u(y)| = \bigg| \int_y^x \partial_t u(t) \ dt \bigg| &\leq \int_y^x |\partial_t u(t)| \ dt \\
+    &= \int_{\R} \1_{[y,x]} |\partial_t u(t)| \ dt \\
+    &\leq \sqrt{|x - y|^2} \| \partial_t u \|_{L^2} = C |x - y|
+\end{split}
+\end{equation*}
+
+Ainsi $u$ est lipschitzienne et donc continue, on a $H^1(\R) \subset \mathcal{C}^0(\R)$
+
+\chapter{Compacité de $BV(\Omega)$ dans $L^1(\Omega)$}
+
+Nous souhaitons démontrer le théorème suivant, 
+
+\begin{theorembox}
+\begin{theorem}
+    Soit $\Omega \subset \mathbb{R}^d$ un ouvert borné à frontière lipschitzienne.
+    Alors l'injection $i : BV(\Omega) \hookrightarrow L^1(\Omega)$ est compacte
+\end{theorem}
+\end{theorembox}
+
+Autrement dit, nous souhaitons démontrer que de toute suite bornée de $BV(\Omega)$ nous pouvons extraire une sous suite qui converge dans l'espace $L^1(\Omega)$ vers un élément $f \in BV(\Omega)$.
+
+Nous suivrons la démarche utilisée dans \cite{Evans}, qui fait intervenir un théorème d'injection de Sobolev puis utilise d'autres résultats intermédiaires de densité et de convergence (que nous admettrons ici) pour finalement montrer que l'injection de $BV(\Omega)$ dans $L^1(\Omega)$ est compacte.
+
+Avant toutes choses, donnons la définition utilisée dans l'ouvrage de référence : 
+\begin{definitionbox}
+\begin{definition}
+    
+    On dit qu'une fonction $f \in L^1(\Omega)$ est à variation bornée dans $\Omega$ et nous écrirons $f \in BV(\Omega)$ si :
+    $$\sup\bigg( \int_{\Omega} f\text{div}\varphi \ dx \ \Big| \ \varphi \in C^1_c(\Omega,\R^d), \ |\varphi| \leq 1 \bigg) < \infty$$
+\end{definition}
+\end{definitionbox}
+
+Rappelons le théorème d'Arzelà-Ascoli, théorème fondamental d'analyse fonctionnelle, qui nous servira dans la démonstration du prochain théorème :
+
+\begin{theorembox}
+\begin{theorem}
+    \textbf{Arzelà-Ascoli}
+
+    Soit $K$ un espace compact et $(E,d)$ un espace métrique. On note $C(K,E)$ l'espace des fonctions continues de $K$ dans $E$, muni de la norme uniforme $\|f\|_{C(K,E)} = \underset{x \in K}{\sup} |f(x)|$
+
+    Une partie $\mathcal{F} \subset C(K,E)$ est relativement compacte (\textit{i.e.} il existe un compact $V$ tel que $\mathcal{F} \subset V$) si et seulement si pour tout $x \in K$:
+    \begin{enumerate}
+        \item $\mathcal{F}$ est équicontinue en $x$. 
+        
+        C'est à dire $\forall \epsilon >0$, il existe W un voisinage de $x$ tel que :
+        $$\forall f \in \mathcal{F}, \ \forall y \in W, \ d(f(x),f(y)) < \epsilon$$
+        
+        \item L'ensemble $\mathcal{F}(x) = \big\{ f(x) \ | \ f \in \mathcal{F} \big\}$ est relativement compact dans E.
+    \end{enumerate}
+\end{theorem}
+\end{theorembox}
+
+Voici le theorème d'injection de Sobolev, que nous adapterons ensuite au cas $p = 1$ : 
+
+\begin{theorembox}
+\begin{theorem}
+    \textbf{Injection de Sobolev}
+    
+    Soit $\Omega \subset \mathbb{R}^d$ un ouvert borné à frontière lipschtzienne, $1 < p < d$.
+
+    \vspace{1em}
+    
+    Soit $(u_k)_{k \in \mathbb{N}} \subset W^{1,p}(\Omega)$ telle que $\underset{k \in \mathbb{N}}{\sup} \|u_k\|_{W^{1,p}} < +\infty$
+    
+    Alors il existe $(u_{\varphi(k)})_k$ une suite extraite et $u \in W^{1,p}(\Omega)$ tels que :
+
+    $$u_{\varphi(k)} \xrightarrow{L^q} u$$
+    Pour $1 \leq q < p^*$, où $\frac{1}{d} = \frac{1}{p} - \frac{1}{p^*}$
+
+    \vspace{1em}
+
+    Autrement dit, l'injection $i : W^{1,p}(\Omega) \hookrightarrow L^q(\Omega)$ est compacte pour $q \in [1,p^*[$ ($p^*$ est appelé l'exposant de Sobolev)
+\end{theorem}
+\end{theorembox}
+
+\begin{proof}
+    Soit $V \subset \R^d$ un ouvert tel que $\Omega \subset V$ et $\bar{\Omega} \subset V$.
+
+    On prolonge chaque $u_k$ à $\bar{u}_k \in W^{1,p}(\R^d)$, avec $\text{supp}(\bar{u}_k) \subset V$ et de telle sorte que :
+    $$\underset{k \in \N}{\sup} \|\bar{u}_k\|_{W^{1,p}(\R^d)} \leq C \ \underset{k \in \N}{\sup}\|u_k\|_{W^{1,p}(\Omega)}$$
+    L'existence d'un tel prolongement est possible pour tout $u \in W^{1,p}(\Omega)$ d'après \cite{Evans} (\textit{chapitre 4.4, Extensions})
+
+    On définit 
+    $$\rho_{\epsilon}(x) = \frac{1}{\epsilon^d} \rho\Big(\frac{x}{\epsilon}\Big) $$ 
+    Une suite régularisante où :
+    $$\rho(x) = 
+    \begin{cases}
+        c \exp \Big(\frac{1}{|x|^2 - 1}\Big) \quad &\text{si } |x| < 1 \\
+        0 &\text{si } |x| \geq 1
+    \end{cases}$$
+    Est une fonction $C^{\infty}$ à support compact (ici dans $B(0,1)$), avec $c$ une constante telle que $\int_{\R^d} \rho \ dx = 1$
+
+    On définit $\bar{u}_k^{\epsilon} := \rho_{\epsilon} \star \bar{u}_k $ une régularisation de $\bar{u}_k$. La démonstration va s'articuler en 
+    plusieurs points importants, qui serviront \textit{in fine} à conclure quant au résultat recherché.
+
+    \vspace{1em}
+    \textbf{1.}
+    Nous allons d'abord montrer que la majoration suivante est vérifiée uniformément pour tout $k \in \N$ :
+    $$\| \bar{u}_k^{\epsilon} - \bar{u}_k \|_{L^p} \leq C\epsilon $$
+    Supposons dans un premier temps que les fonctions $\bar{u}_k$ sont régulières (par exemple $C^1$),
+    \begin{equation*}
+    \begin{split}
+        |\bar{u}_k^{\epsilon}(x) - \bar{u}_k(x)| &= \bigg| \int_{\R^d} \bar{u}_k(x - y)\rho_{\epsilon}(y) - \bar{u}_k(x)\rho_{\epsilon}(y) \ dy \bigg| \\
+        &\leq \int_{\R^d} \rho_{\epsilon}(y) \big| \bar{u}_k(x - y) - \bar{u}_k(x) \big| \ dy \\
+        &\leq \int_{B(0,1)} \rho(z) \big| \bar{u}_k(x - \epsilon z) - \bar{u}_k(x) \big| \ dz \quad \text{en posant } z = \epsilon y \\ 
+        &= \int_{B(0,1)} \rho(z) \Big| \int_{0}^{1} \frac{d}{dt} \bar{u}_k(x - \epsilon t z) \ dt \Big| \ dz \\
+        &\leq \int_{B(0,1)} \rho(z) \int_{0}^{1} \big| -\epsilon D \bar{u}_k(x - \epsilon t z) \cdot z \big| \ dt dz \\
+        &\leq \epsilon \int_{B(0,1)} \rho(z) \int_{0}^{1} \|D \bar{u}_k(x - \epsilon t z)\|_{l^2} \| z \|_{l^2} \ dt dz \\
+        &\leq C_0 \epsilon \int_{B(0,1)} \rho(z) \int_{0}^{1} \|D \bar{u}_k(x - \epsilon t z)\|_{l^p} \ dt dz
+    \end{split}
+    \end{equation*}
+    Et puis,
+    \begin{equation*}
+    \begin{split}
+        \| \bar{u}_k^{\epsilon} - \bar{u}_k \|_{L^p}^p &\leq  \int_{\R^d} \bigg(C_0 \epsilon \int_{B(0,1)} \rho(z) \int_{0}^{1} \| D \bar{u}_k(x - \epsilon t z) \|_{l^p} \ dt dz \bigg)^p dx \\
+        &= C \epsilon^p \int_{B(0,1)} \rho(z) \int_{0}^{1} \int_{\R^d} \| D \bar{u}_k(x - \epsilon t z) \|_{l^p}^p \ dx dt dz \quad \text{par Tonelli} \\
+        &= C \epsilon^p \int_{B(0,1)} \rho(z) \int_{0}^{1} \bigg( \int_{\R^d} \sum_{i=1}^{d} |\partial_{x_i} \bar{u}_k(x - \epsilon t z)|^p \ dx \bigg) dt dz \\
+        &= C \epsilon^p \int_{B(0,1)} \rho(z) \int_{0}^{1} \bigg( \sum_{i=1}^{d}  \| \partial_{x_i} \bar{u}_k \|_{L^p}^p \ dx \bigg) dt dz \\
+        &\leq C \epsilon^p \| \bar{u}_k \|_{W^{1,p}(\R^d)}^p \leq \tilde{C} \epsilon^p
+    \end{split}
+    \end{equation*}
+
+    \vspace{1em}
+
+    \textbf{2.}
+    Ensuite nous montrons que pour tout $\epsilon > 0$, la suite $(\bar{u}_k^{\epsilon})_{k \in \N}$ est bornée et équicontinue sur $\R^d$ :
+    \begin{equation*}
+    \begin{split}
+        |\bar{u}_k^{\epsilon}(x)| &\leq \int_{B(x,\epsilon)} |\rho_{\epsilon}(x - y)\bar{u}_k(y)| \ dy \\
+        &= \int_{B(x,\epsilon)} \frac{1}{\epsilon^d} \rho\Big(\frac{x - y}{\epsilon}\Big) | \bar{u}_k(y)| \ dy \\
+        &= \int_{B(0,1)} \rho(z) \big|\bar{u}_k(x - z\epsilon)\big| \ dz \\
+        &\leq \bigg(\int_{\R^d} \rho(z)^{p'} \ dz\bigg)^{\frac{1}{p'}}\bigg( \int_{\R^d} |\bar{u}_k(x - z\epsilon)|^p \ dz \bigg)^{\frac{1}{p}} \\
+        &= C \epsilon^{-\frac{d}{p}} \| \bar{u}_k \|_{L^p} \leq \tilde{C} \epsilon^{-\frac{d}{p}}
+    \end{split}
+    \end{equation*}
+    Où $\frac{1}{p} + \frac{1}{p'} = 1$ et $\rho \in \mathcal{D}(\R^d) \subset L^{p'}(\R^d)$.
+
+    Cela montre que la suite $(\bar{u}_k^{\epsilon})_k$ est uniformément bornée.
+
+    \begin{equation*}
+    \begin{split}
+        |D\bar{u}_k^{\epsilon}(x)| &= \bigg| \int_{B(x,\epsilon)} D\rho_{\epsilon}(x - y)\bar{u}_k(y) \ dy \bigg| \\
+        &\leq \int_{B(x,\epsilon)} \frac{1}{\epsilon^d} \frac{1}{\epsilon} D \rho\Big( \frac{x - y}{\epsilon} \Big) |\bar{u}_k(y)| \ dy \\
+        &\leq \int_{B(0,1)}\frac{1}{\epsilon} D \rho(z) |\bar{u}_k(x - \epsilon z)| \ dz \\
+        &\leq \frac{1}{\epsilon} \|D\rho\|_{L^{p^*}} \bigg( \int_{\R^d} |\bar{u}_k(x - z\epsilon)|^p \ dz \bigg)^{\frac{1}{p}} \\
+        &= C \epsilon^{-\frac{p}{d} - 1} \| \bar{u}_k \|_{L^p} \leq \tilde{C} \epsilon^{-\frac{p}{d} - 1}
+    \end{split}
+    \end{equation*}
+    Nous venons de montrer que nous pouvons borner le taux de variation de la suite, alors par l'inégalité des accroissements finis, pour $x,y \in \R^d$,
+    $$|\bar{u}_k^{\epsilon}(x) - \bar{u}_k^{\epsilon}(y)| \leq \underset{\xi \in [x,y]}{\sup}\lvert\!\lvert\!\lvert D\bar{u}_k^{\epsilon}(\xi) \rvert\!\rvert\!\rvert \|x - y\|_{l^2} \leq \tilde{C}\epsilon^{-\frac{p}{d} - 1} \|x - y\|_{l^2} $$
+
+    Donc pour $x \in \R^d$ fixé, en posant $U = B\Big(x,\frac{\eta}{\tilde{C}\epsilon^{-\frac{p}{d} - 1}}\Big)$, pour tout $y\in U$ et $k\in \N$ :
+    $$|\bar{u}_k^{\epsilon}(x) - \bar{u}_k^{\epsilon}(y)| \leq \eta $$
+    Ce qui est exactement la définition de l'équicontinuité.
+    \vspace{1em}
+
+    \textbf{3.}
+    Nous montrons maintenant que pour tout $\delta >0$, il existe une sous suite $(u_{k_j})_{j \in \N}$ de $(u_k)_k$ telle que :
+    $$\underset{i,j \to +\infty}{\lim\sup} \| u_{k_i} - u_{k_j} \|_{L^p(\Omega)} \leq \delta$$
+
+    Pour cela, à partir du premier point, nous pouvons choisir $\epsilon \leq \frac{\delta}{3C}$, de cette façon nous avons :
+    $$ \underset{k \in \N}{\sup} \| \bar{u}_k^{\epsilon} - \bar{u}_k \|_{L^p(\R^d)} \leq \frac{\delta}{3} $$
+    Maintenant, avec ce que nous avons montré au second point, nous pouvons appliquer le théorème d'Arzelà-Ascoli.
+    En effet, la suite de fonctions $(\bar{u}_k^{\epsilon})_{k \in \N}$ est équicontinue et uniformément bornée, donc l'ensemble $\big\{ \bar{u}_k^{\epsilon}(x) \ | \ x \in \R^d \big\}$ est relativement compact dans $\R^d$.
+
+    Par le théorème d'Arzelà-Ascoli, l'ensemble $\{ \bar{u}_k^{\epsilon} \ | \ k \in \N \}$ est relativement compact dans l'espace des fonctions continues sur un compact.
+    Il existe alors une sous suite $(\bar{u}_{k_j}^{\epsilon})_{j\in\N}$ de $(\bar{u}_k^{\epsilon})_k$ qui converge uniformément sur $\R^d$. Alors, en utilisant les premiers et deuxièmes points nous pouvons écrire :
+    \begin{equation*}
+    \begin{split}
+        \| u_{k_i} - u_{k_j} \|_{L^p(\Omega)} &\leq \| \bar{u}_{k_i} - \bar{u}_{k_j} \|_{L^p(\Omega)} \\
+        &\leq \| \bar{u}_{k_i} - \bar{u}_{k_i}^{\epsilon} \|_{L^p(\Omega)} + \| \bar{u}_{k_i}^{\epsilon} - \bar{u}_{k_j}^{\epsilon} \|_{L^p(\Omega)} + \| \bar{u}_{k_j}^{\epsilon} - \bar{u}_{k_j} \|_{L^p(\Omega)} \\
+        &\leq \frac{2\delta}{3} + \| \bar{u}_{k_i}^{\epsilon} - \bar{u}_{k_j}^{\epsilon} \|_{L^p(\Omega)} \\
+        &\leq \frac{2\delta}{3} + |\Omega| \ \underset{x \in \Omega}{\sup}|\bar{u}_{k_i}^{\epsilon}(x) - \bar{u}_{k_j}^{\epsilon}(x)|^p \\
+        &\leq \delta
+    \end{split}
+    \end{equation*}
+    Pour $i,j$ au delà d'un certain rang.
+
+    \vspace{1em}
+
+    \textbf{4.}
+    Maintenant nous construisons une sous suite, par un argument diagonal. En prenant $\delta = \frac{1}{2^j}$ dans le point précédent, et on assemble une sous suite à partir des termes successifs, toujours notée $(u_{k_j})_{j \in \N}$ qui converge vers $u \in L^p(\Omega)$
+
+    Pour tout $q$ tel que $1 \leq q < p^*$ où $\frac{1}{q} = \frac{\theta}{p} + \frac{1 - \theta}{p^*}$, pour $\theta \in ]0,1[$ on a l'inégalité de Hölder généralisée :
+    $$\|u_{k_j} - u\|_{L^q(\Omega)} \leq \|u_{k_j} - u\|_{L^p(\Omega)}^{\theta} \|u_{k_j} - u\|_{L^{p^*}(\Omega)}^{1 - \theta} $$
+
+    L'une des conséquences de l'inégalité Gagliardo-Nirenberg-Sobolev, est que l'espace $W^{1,p}(\R^d)$ s'injecte continûement dans $L^{p^*}(\R^d)$ \cite{Evans}.
+    Ainsi, puisque $(u_k)_{k \in \N}$ est bornée dans $W^{1,p}(\Omega)$, l'inégalité $\| u_k \|_{L^{p^*}(\Omega)} \leq C \| u_k \|_{W^{1,p}(\Omega)} $ a lieu pour une certaine constante $C$. Ainsi $(u_k)_k$ est bornée dans $L^{p^*}(\Omega)$. 
+    
+    Il en résulte que pour $1 \leq q < p^* $, puisque $\|u_{k_j} - u \|_{L^p(\Omega)} \xrightarrow[j \to +\infty]{} 0$, alors :
+    $$\underset{j \to +\infty}{\lim} \| u_{k_j} - u \|_{L^q(\Omega)} = 0 $$
+
+
+    \vspace{1em}
+
+    \textbf{5.}
+    Pour $p>1$, l'espace $L^p(\Omega)$ est reflexif (le bidual de $L^p$ est égal à lui même), et le théorème de Banach-Alaoglu permet d'affirmer (en remarquant dans ce cas que topologie faible-* et topologie faible coïncident)
+    que pour une suite bornée de $L^p(\Omega)$, il existe une sous suite qui converge faiblement dans $L^p(\Omega)$ vers un élément $u \in L^p(\Omega)$.
+    
+    En appliquant ce résultat à la suite $(u_k)_{k \in \N}$ comme suite bornée dans $W^{1,p}(\Omega)$, nous pouvons extraire deux informations :
+    \begin{enumerate}
+        \item En appliquant Banach-Alaoglu à $(u_k)_{k\in N}$ comme suite bornée de $L^p(\Omega)$ (ce qui est possible puisque $\|\cdot\|_{L^p} \leq \|\cdot\|_{W^{1,p}}$) alors il existe $(u_{k_j})_j$ et $v \in L^p(\Omega)$ tels que $u_{k_j} \rightharpoonup v$ dans $L^p(\Omega)$
+        \item Puis en réitérant l'argument à $(\nabla u_k)_{k \in \N}$ (pour les mêmes raisons qu'au dessus), alors il existe $(\nabla u_{k_j})_j$ et $g\in L^p(\Omega)$ tels que $\nabla u_{k_j} \rightharpoonup g$ dans $L^p(\Omega)$.
+    \end{enumerate}
+
+    Ces deux suites extraites se regroupent bien en une seule sous suite de $(u_{k})_{k\in \N}$ dans $W^{1,p}(\Omega)$ :
+
+    En effet, pour $i \in \llbracket 1,d \rrbracket$, et $\varphi \in \mathcal{D}(\Omega) \subset L^{p'}(\Omega)$ :
+    $$\begin{cases}
+        \big< \varphi, \partial_{x_i} u_{k_j} \big>_{L^{p'}(\Omega),L^p(\Omega)} = - \big<\partial_{x_i}\varphi, u_{k_j} \big>_{L^{p'}(\Omega),L^p(\Omega)} \\
+        \big<\varphi, \partial_{x_i} u_{k_j} \big>_{L^{p'}(\Omega),L^p(\Omega)} \xrightarrow[j \to +\infty]{}  \big<\varphi, g_i \big>_{L^{p'}(\Omega),L^p(\Omega)} \\
+        - \big<\partial_{x_i}\varphi, u_{k_j} \big>_{L^{p'}(\Omega),L^p(\Omega)} \xrightarrow[j \to +\infty]{} - \big<\partial_{x_i}\varphi,u \big>_{L^{p'}(\Omega),L^p(\Omega)}
+    \end{cases}$$
+
+    Nous obtenons que la limite faible $u$ admet des dérivées faibles qui sont dans $L^p(\Omega)$, $\partial_{x_i}u = g_i \in L^p(\Omega)$.
+    Nous avons ainsi $u_{k_j} \rightharpoonup u$ dans $W^{1,p}(\Omega)$.
+
+    \vspace{1em}
+
+    \textbf{6.}
+    En appliquant le point 4. à la sous suite $(u_{k_j})_{j \in \N}$ extraite en 5. (puisque cette dernière est bornée, comme extraction d'une suite bornée de $W^{1,p}(\Omega)$), nous avons existence d'une suite extraite de la suite extraite, que nous pouvons noter $(u_{k_{j_m}})_{m\in \N}$, qui converge vers $v \in L^p(\Omega)$. 
+    Cette suite converge fortement, et donc aussi faiblement, dans $L^q(\Omega)$ ($1 \leq q < p^*$) vers $v \in L^p(\Omega)$
+
+    La continuité de l'injection $i : W^{1,p}(\Omega) \hookrightarrow L^q(\Omega)$, implique qu'une suite faiblement convergente dans $W^{1,p}(\Omega)$ est également faiblement convergente dans $L^q(\Omega)$ :
+    
+    Soit $\varphi \in L^{q'}(\Omega)$, par continuité de $i$ nous avons $i(u_{k_j}) \xrightarrow[j \to +\infty]{} i(u)$ et ainsi :
+    $$ \big< \varphi , i(u_{k_j}) \big>_{L^{q'}(\Omega),L^q(\Omega)} \xrightarrow[j \to +\infty]{} \big<\varphi, i(u) \big>_{L^{q'}(\Omega),L^q(\Omega)}, $$
+
+
+    \vspace{1em}
+    Ainsi, pour récapituler, nous avons une suite extraite $(u_{k_j})_j$ qui converge faiblement dans $L^q(\Omega)$ vers un élément $u \in W^{1,p}(\Omega)$ et une sous suite de la suite extraite $(u_{k_{j_m}})_m$ qui converge fortement et faiblement dans $L^q(\Omega)$ vers un élément $v \in L^p(\Omega)$.
+    Puisque la suite $(u_{k_j})_j$ converge faiblement vers $u$, alors nécessairement, la suite extraite $(u_{k_{j_m}})_m$ converge faiblement également vers $u$.
+    
+    Finalement, par unicité de la limite faible dans $L^q(\Omega)$, on a $u \in W^{1,p}(\Omega)$ et $(u_{k_{j_m}})_{m\in \N}$ converge fortement dans $L^q(\Omega)$ vers $u$, pour $1\leq q < p^*$.
+
+\end{proof}
+
+\begin{remarkbox}
+\begin{remark}
+    Le théorème que nous venons de démontrer ne s'applique que dans le cas où $p>1$, comme en témoigne l'emploi du théorème de Banach-Alaoglu, basé sur la réflexivité de $L^p$.
+    Une façon d'adapter ce raisonnement se fait en utilisant le théorème de Fréchet-Kolmogorov, qui permettra, au même titre que le théorème d'Arzelà-Ascoli, d'identifier les parties relativement compactes de $L^p$ pour $p \in [1,+\infty[$, sans avoir à se soucier de la non-réflexivité de $L^1$.
+\end{remark}
+\end{remarkbox}
+
+\begin{theorembox}
+\begin{theorem}
+    \textbf{Fréchet-Kolmogorov}
+
+    Soit $p \in [1,+\infty[$ et $\mathcal{F} \subset L^p(\R^d)$.
+
+    $\mathcal{F}$ est relativement compacte dans $L^p(\R^d)$ si et seulement si les trois propriétés sont vérifiées :
+    \begin{enumerate}
+        \item $\mathcal{F}$ est borneé dans $L^p(\R^d)$
+        \item $ \displaystyle \underset{r \to +\infty}{\lim} \int_{\|x\| \geq r} |f|^p \ dx = 0$, uniformément pour tout $f \in \mathcal{F}$ 
+        \item $\displaystyle \underset{h \to 0}{\lim} \| \tau_h f - f \|_{L^p} = 0$, uniformément pour tout $f \in \mathcal{F}$, où $\tau_h$ désigne la translation par $h$.
+    \end{enumerate}
+\end{theorem}
+\end{theorembox}
+
+En reprenant une suite bornée $(u_k)_k \subset W^{1,1}(\Omega)$, nous montrons que nous pouvons extraire une sous suite qui converge dans $L^1(\Omega)$ vers un élément $u \in L^1(\Omega)$.
+Vérifions que $(u_k)_k$ satsifait les conditions du théorème de Fréchet-Kolmogorov.
+
+La première hypothèse est déjà vérifiée, puisque la suite est bornée dans $W^{1,1}(\Omega)$, alors :
+$$\|u_k\|_{L^1(\Omega)} \leq \|u_k\|_{W^{1,1}(\Omega)} \leq \underset{k\in \N}{\sup}\|u_k\|_{W^{1,1}(\Omega)} < \infty$$
+Donc $(u_k)_k$ est bornée dans $L^1(\Omega)$.
+
+Le deuxième point ne demande pas réellement de vérification puisque nous travaillons sur $\Omega$ qui est un ouvert borné, nous pouvons prolonger toutes nos fonctions $u_k$ par 0 sur $\R^d$ et ainsi vérifier ce point.
+
+En ce qui concerne le troisième point, soit $h\in \R^d$ et posons $\Omega_h = \big\{ x \in \Omega \ | \ x + h \in \Omega \big\}$.
+Supposons dans un premier temps que $(u_k)_k \subset W^{1,1}(\Omega) \cap C^{\infty}(\Omega)$. Nous allons établir le résultat dans cette configuration puis nous pourrons conclure à l'aide d'un argument de densité.
+\begin{equation*}
+\begin{split}
+    |\tau_h u_k(x) - u_k(x)| = |u_k(x+h) - u_k(x)| &\leq \int_{0}^{1} \Big| \frac{d}{dt}u_k(x+th) \Big| \ dt \\
+    &= \int_{0}^{1} \big| \nabla u_k(x+th) \cdot h \big| \ dt \\
+    &\leq \int_{0}^{1} \|\nabla u_k(x + th)\|_{l^2}\|h\|_{l^2} \ dt
+\end{split}
+\end{equation*}
+\begin{equation*}
+\begin{split}
+    \| \tau_h u_k - u_k \|_{L^1(\Omega)} &\leq \int_{\Omega_h} \int_{0}^{1} \|\nabla u_k(x + th)\|_{l^2}\|h\|_{l^2}  \ dt dx \\
+    &= \int_{0}^{1} \int_{\Omega_h} \|\nabla u_k(x + th)\|_{l^2}\|h\|_{l^2}  \ dx dt \quad \text{ par Tonelli} \\
+    &\leq \int_{0}^{1} \int_{\Omega} \| \nabla u_k(x) \|_{l^2} \|h\|_{l^2} \ dx dt \\
+    &= \| \nabla u_k \|_{L^1} \|h\|_{l^2}
+\end{split}
+\end{equation*}
+Maintenant par densité de $W^{1,1}(\Omega) \cap C^{\infty}(\Omega)$ dans $W^{1,1}(\Omega)$ (théorème de Meyers-Serrin), pour tout $k$ il existe une suite $(w^k_j)_{j \in \N} \subset W^{1,1}(\Omega)\cap C^{\infty}(\Omega)$ qui converge vers $u_k$ dans $W^{1,1}(\Omega)$.
+Par continuité de l'application $v \mapsto \| v \|_{L^1}$ et de la translatée $\tau_h$, et en combinant cela avec la bornéitude de $(\nabla u_k)_k$ dans $L^1(\Omega)$, l'inégalité suivante est vérifiée pour tout $k\in \N$ dans $W^{1,1}(\Omega)$ :
+$$ \| \tau_h u_k - u_k \|_{L^1(\Omega)} \leq \underset{k \in \N}{\sup}\| \nabla u_k \|_{L^1(\Omega)} \|h\|_{l^2} $$
+Et ainsi, uniformément pour tout $k \in \N$ :
+$$\underset{|h| \to 0}{\lim} \| \tau_h u_k - u_k \|_{L^1(\Omega)} = 0 $$
+Finalement, puisque toutes les conditions sont réunies, par le théorème de Fréchet-Kolmogorov, il existe $(u_{k_j})_{j \in \N}$ sous suite et $u \in L^1(\Omega)$ tels que :
+$$ \underset{j \to +\infty}{\lim} \| u_{k_j} - u \|_{L^1(\Omega)} = 0 $$
+
+
+\vspace{1em}
+
+Nous admettons les deux théorèmes suivants :
+
+\begin{theorembox}
+\begin{theorem}
+    Soit $f \in BV(\Omega)$
+
+    Alors il existe $(f_k)_k \subset C^{\infty}(\Omega) \cap BV(\Omega)$ telle que 
+    \begin{enumerate}
+        \item $f_k \xrightarrow{L^1} f$
+        \item $\| Df_k \| (\Omega) \underset{k \to +\infty}{\longrightarrow} \| Df \| (\Omega)$
+    \end{enumerate}
+
+\end{theorem}
+\end{theorembox}
+
+\begin{remarkbox}
+\begin{remark}
+    Le premier point revient à dire que $C^{\infty}(\Omega) \cap BV(\Omega)$ est dense dans $BV(\Omega)$ pour la topologie de $L^1(\Omega)$.
+
+    \vspace{1em}
+    Nous appelons $\|Df\|(\Omega)$ la mesure de variation sur $BV_{loc}(\Omega)$ (voir \cite{Evans} pour plus de détails), définie par :
+    $$\|Df\| (\Omega) = \sup \bigg(\int_{\Omega} f \text{div}\varphi \ dx \ \Big| \ \varphi \in C^1_c(\Omega,\R^d), \ |\varphi| \leq 1 \bigg)$$
+\end{remark}
+\end{remarkbox}
+
+\begin{theorembox}
+\begin{theorem}
+    
+    Supposons $(u_k)_k \subset BV(\Omega)$ et $u_k \xrightarrow[k \to +\infty]{L^1_{loc}(\Omega)} u$.
+
+    Alors :
+    $$ \| Du \|(\Omega) \leq \underset{k \to +\infty}{\lim \inf}\|Du_k\|(\Omega) $$
+
+\end{theorem}
+\end{theorembox}
+
+Nous allons nous appuyer sur ces derniers résultats pour finalement montrer que pour une suite bornée dans $BV(\Omega)$ nous pouvons extraire une sous suite qui converge dans $L^1(\Omega)$. 
+
+Soit $(u_k)_{k \in \N} \subset BV(\Omega)$ bornée.
+
+Par l'un des théorèmes précédent, pour chaque $k \in \N$, il existe une suite $(g^k_j)_{j \in \N} \subset BV(\Omega) \cap C^{\infty}(\Omega)$ telle que $\|g^k_j - u_k\|_{L^1(\Omega)} \xrightarrow[j \to +\infty]{} 0$.
+Nous pouvons choisir de construire une suite $(g_k)_k$ à partir de ces suites, toujours d'après le théorème, en choisisssant $g_k$ de sorte que :
+$$\begin{cases}
+    \displaystyle \int_{\Omega} |u_k - g_k| \ dx \leq \frac{1}{k} \\
+    \displaystyle \underset{k \in \N}{\sup}\int_{\Omega} |Dg_k| \ dx \leq + \infty
+\end{cases}$$
+D'après le théorème de Fréchet-Kolmogorov, nous pouvons extraire une sous suite $(g_{k_j})_{j \in \N}$ telle que $g_{k_j} \xrightarrow[j \to +\infty]{L^1(\Omega)} u $, pour $u \in L^1(\Omega)$.
+Mais dans ce cas, puisque nous avons choisi $g_k$ de sorte que :
+$$\int_{\Omega} |u_k - g_k| \ dx \leq \frac{1}{k} $$
+Alors $u_{k_j} \xrightarrow[j \to +\infty]{L^1(\Omega)}u$ également.
+Mais d'après le théorème précédent, nous avons un contrôle par la lim inf de $\|Dg_k\|(\Omega)$, qui est bornée. Ce qui nous donne finalement $\|Du\|(\Omega) < +\infty$ et ainsi $u \in BV(\Omega)$. 
+
+Le théorème présenté en début de section est ainsi démontré.
